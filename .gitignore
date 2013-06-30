@@ -1,5 +1,6 @@
 bin
 obj
+*.userprefs
 
 # Mac crap
 .DS_Store
