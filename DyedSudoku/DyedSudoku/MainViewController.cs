@@ -28,15 +28,21 @@ namespace Utility
 
         partial void showInfo(NSObject sender)
         {
-            var controller = new FlipsideViewController {ModalTransitionStyle = UIModalTransitionStyle.PartialCurl};
-            controller.Done += delegate {DismissViewController(true, null);};
+            var controller = new InfoViewController { ModalTransitionStyle = UIModalTransitionStyle.PartialCurl };
+            controller.Done += delegate
+            {
+                DismissViewController(true, null);
+            };
             PresentViewController(controller, true, null);
         }
 
-        partial void touch(NSObject sender)
+        partial void start(NSObject sender)
         {
-            var controller = new FlipsideViewController{ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve};
-            controller.Done += (s, e) => {DismissViewController(true, null);};
+            var controller = new PlayLocalViewController { ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve };
+            controller.Done += delegate
+            {
+                DismissViewController(true, null);
+            };
             PresentViewController(controller, true, null);
         }
     }

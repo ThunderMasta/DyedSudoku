@@ -15,7 +15,7 @@ namespace Utility
 		partial void showInfo (MonoTouch.Foundation.NSObject sender);
 
 		[Action ("touch:")]
-		partial void touch (MonoTouch.Foundation.NSObject sender);
+		partial void start (MonoTouch.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
