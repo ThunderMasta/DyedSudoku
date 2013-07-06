@@ -2,37 +2,54 @@ using System;
 using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using System.Threading;
 
-namespace Utility
+namespace DyedSudoku
 {
-	public partial class PlayLocalViewController : UIViewController
-	{
-        public PlayLocalViewController () : base ("PlayLocalViewController", null)
-		{
-		}
+    public partial class PlayLocalViewController : UIViewController
+    {
+        private Thread updateThread;
 
-		public override void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
+        public PlayLocalViewController() : base ("PlayLocalViewController", null)
+        {
+            gameFieldView = new GameFieldView();
+            updateThread = new Thread(UpdateGameField);
+            updateThread.Start();
+        }
 
-			// Perform any additional setup after loading the view, typically from a nib.
-		}
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
 
-		public override void DidReceiveMemoryWarning ()
-		{
-			// Releases the view if it doesn't have a superview.
-			base.DidReceiveMemoryWarning ();
+            // Perform any additional setup after loading the view, typically from a nib.
+        }
+
+        public override void DidReceiveMemoryWarning()
+        {
+            // Releases the view if it doesn't have a superview.
+            base.DidReceiveMemoryWarning();
 			
-			// Release any cached data, images, etc that aren't in use.
-		}
+            // Release any cached data, images, etc that aren't in use.
+        }
 
-        partial void done (MonoTouch.Foundation.NSObject sender)
-		{
-			if (Done != null)
-				Done (this, EventArgs.Empty);
-		}
+        public event EventHandler Done;
 
-		public event EventHandler Done;
-	}
+        partial void done(MonoTouch.Foundation.NSObject sender)
+        {
+            updateThread.Abort();
+            updateThread = null;
+
+            if (Done != null)
+                Done(this, EventArgs.Empty);
+        }
+
+        private void UpdateGameField()
+        {
+            while (true)
+            {
+                BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
+            }
+        }
+    }
 }
 

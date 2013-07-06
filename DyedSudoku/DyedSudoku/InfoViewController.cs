@@ -3,7 +3,7 @@ using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-namespace Utility
+namespace DyedSudoku
 {
     public partial class InfoViewController : UIViewController
     {

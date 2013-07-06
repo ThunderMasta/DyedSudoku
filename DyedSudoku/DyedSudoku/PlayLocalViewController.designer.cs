@@ -6,22 +6,22 @@
 //
 using MonoTouch.Foundation;
 
-namespace Utility
+namespace DyedSudoku
 {
 	[Register ("FlipsideViewController")]
 	partial class PlayLocalViewController
 	{
 		[Outlet]
-		MonoTouch.UIKit.UIImageView uiImageView { get; set; }
+		GameFieldView gameFieldView { get; set; }
 
 		[Action ("done:")]
 		partial void done (MonoTouch.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (uiImageView != null) {
-				uiImageView.Dispose ();
-				uiImageView = null;
+			if (gameFieldView != null) {
+				gameFieldView.Dispose ();
+				gameFieldView = null;
 			}
 		}
 	}

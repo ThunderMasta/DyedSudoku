@@ -104,6 +104,7 @@
     <Compile Include="PlayLocalViewController.designer.cs">
       <DependentUpon>PlayLocalViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="GameFieldView.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainViewController.xib" />

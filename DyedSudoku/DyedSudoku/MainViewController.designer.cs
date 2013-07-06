@@ -6,7 +6,7 @@
 //
 using MonoTouch.Foundation;
 
-namespace Utility
+namespace DyedSudoku
 {
 	[Register ("MainViewController")]
 	partial class MainViewController

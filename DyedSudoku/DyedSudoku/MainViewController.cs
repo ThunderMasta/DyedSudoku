@@ -2,7 +2,7 @@ using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-namespace Utility
+namespace DyedSudoku
 {
     public partial class MainViewController : UIViewController
     {
