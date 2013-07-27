@@ -8,6 +8,7 @@ namespace DyedSudoku
 {
     public partial class PlayLocalViewController : UIViewController
     {
+        // Need update thread for custom animation
         private Thread updateThread;
 
         public PlayLocalViewController() : base ("PlayLocalViewController", null)
@@ -47,6 +48,8 @@ namespace DyedSudoku
         {
             while (true)
             {
+                //Sleep for 60 fps
+                Thread.Sleep(15);
                 BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
             }
         }

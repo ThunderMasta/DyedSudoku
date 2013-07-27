@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,7 +8,7 @@
     <ProjectGuid>{9B2DE9F0-F8E1-4637-BBE9-EF87A106D499}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Utility</RootNamespace>
+    <RootNamespace>DyedSudoku</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
@@ -85,6 +85,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Views\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -104,14 +107,16 @@
     <Compile Include="PlayLocalViewController.designer.cs">
       <DependentUpon>PlayLocalViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="GameFieldView.cs" />
+    <Compile Include="Views\GameFieldView.cs" />
+    <Compile Include="ViewModels\GameFieldViewModel.cs" />
+    <Compile Include="Models\GameFieldModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainViewController.xib" />
     <InterfaceDefinition Include="PlayLocalViewController.xib" />
     <InterfaceDefinition Include="InfoViewController.xib" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -126,5 +131,11 @@
   </ProjectExtensions>
   <ItemGroup>
     <BundleResource Include="Resources\Half Dome.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{C0971053-8775-4F09-B8BE-E366BD008B09}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -4,3 +4,6 @@ obj
 
 # Mac crap
 .DS_Store
+
+# VS user settings
+*.suo
