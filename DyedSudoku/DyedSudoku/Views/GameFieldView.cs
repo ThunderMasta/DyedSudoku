@@ -24,12 +24,17 @@ namespace DyedSudoku
 
         public GameFieldView(GameFieldViewModel viewModel)
         {
-            dataSource = viewModel;
+            SetDataSource(viewModel);
         }
 
         private void InitDataSource()
         {
-            dataSource = new GameFieldViewModel(Bounds);
+            SetDataSource(new GameFieldViewModel(Bounds));
+        }
+
+        public void UpdateFrame()
+        {
+            Frame = dataSource.Frame;
         }
 
         public override void Draw(RectangleF rect)
@@ -38,6 +43,11 @@ namespace DyedSudoku
 
             using (CGContext context = UIGraphics.GetCurrentContext())
                 dataSource.Draw(context);
+        }
+
+        public void SetDataSource(GameFieldViewModel viewModel)
+        {
+            dataSource = viewModel;
         }
     }
 }

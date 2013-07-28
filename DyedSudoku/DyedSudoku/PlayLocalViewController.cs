@@ -13,9 +13,30 @@ namespace DyedSudoku
 
         public PlayLocalViewController() : base ("PlayLocalViewController", null)
         {
-            gameFieldView = new GameFieldView();
+            InitGameFieldView();
+
+            StartUpdateThread();
+        }
+
+        private void InitGameFieldView()
+        {
+            var width = View.Frame.Width - 10;
+            var frame = new RectangleF(5, gameFieldView.Frame.Y, width, width);
+
+            gameFieldView.Frame = frame;
+            gameFieldView.SetDataSource(new GameFieldViewModel(frame));
+        }
+
+        private void StartUpdateThread()
+        {
             updateThread = new Thread(UpdateGameField);
             updateThread.Start();
+        }
+
+        private void StopUpdateThread()
+        {
+            updateThread.Abort();
+            updateThread = null;
         }
 
         public override void ViewDidLoad()
@@ -37,8 +58,7 @@ namespace DyedSudoku
 
         partial void done(MonoTouch.Foundation.NSObject sender)
         {
-            updateThread.Abort();
-            updateThread = null;
+            StopUpdateThread();
 
             if (Done != null)
                 Done(this, EventArgs.Empty);

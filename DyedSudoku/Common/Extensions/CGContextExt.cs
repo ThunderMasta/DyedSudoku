@@ -1,5 +1,6 @@
 using System;
 using MonoTouch.CoreGraphics;
+using MonoTouch.UIKit;
 
 namespace Common
 {
@@ -15,14 +16,14 @@ namespace Common
         {
             context.SetLineWidth(1);
             context.SetTextDrawingMode(CGTextDrawingMode.FillStroke);
-            context.SelectFont("Helvetica", 18, CGTextEncoding.MacRoman);
+            context.SelectFont("Helvetica", 26, CGTextEncoding.MacRoman);
         }
 
         public static void SetDefaultInfoTextSettings(this CGContext context)
         {
             context.SetLineWidth(1);
             context.SetTextDrawingMode(CGTextDrawingMode.FillStroke);
-            context.SetStrokeColor(0, 0, 1, 1);
+            context.SetStrokeColor(UIColor.Red.CGColor);
             context.SelectFont("Helvetica", 12, CGTextEncoding.MacRoman);
         }
     }

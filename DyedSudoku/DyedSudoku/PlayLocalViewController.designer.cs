@@ -8,21 +8,22 @@ using MonoTouch.Foundation;
 
 namespace DyedSudoku
 {
-	[Register ("FlipsideViewController")]
-	partial class PlayLocalViewController
-	{
-		[Outlet]
-		GameFieldView gameFieldView { get; set; }
+    [Register ("PlayLocalViewController")]
+    partial class PlayLocalViewController
+    {
+        [Outlet]
+        GameFieldView gameFieldView { get; set; }
 
-		[Action ("done:")]
-		partial void done (MonoTouch.Foundation.NSObject sender);
-		
-		void ReleaseDesignerOutlets ()
-		{
-			if (gameFieldView != null) {
-				gameFieldView.Dispose ();
-				gameFieldView = null;
-			}
-		}
-	}
+        [Action ("done:")]
+        partial void done(MonoTouch.Foundation.NSObject sender);
+
+        void ReleaseDesignerOutlets()
+        {
+            if (gameFieldView != null)
+            {
+                gameFieldView.Dispose();
+                gameFieldView = null;
+            }
+        }
+    }
 }

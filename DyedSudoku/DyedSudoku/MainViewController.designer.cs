@@ -8,17 +8,17 @@ using MonoTouch.Foundation;
 
 namespace DyedSudoku
 {
-	[Register ("MainViewController")]
-	partial class MainViewController
-	{
-		[Action ("showInfo:")]
-		partial void showInfo (MonoTouch.Foundation.NSObject sender);
+    [Register ("MainViewController")]
+    partial class MainViewController
+    {
+        [Action ("showInfo:")]
+        partial void showInfo(MonoTouch.Foundation.NSObject sender);
 
-		[Action ("touch:")]
-		partial void start (MonoTouch.Foundation.NSObject sender);
-		
-		void ReleaseDesignerOutlets ()
-		{
-		}
-	}
+        [Action ("touch:")]
+        partial void start(MonoTouch.Foundation.NSObject sender);
+
+        void ReleaseDesignerOutlets()
+        {
+        }
+    }
 }

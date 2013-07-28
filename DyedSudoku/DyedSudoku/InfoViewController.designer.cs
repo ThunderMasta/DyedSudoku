@@ -8,14 +8,14 @@ using MonoTouch.Foundation;
 
 namespace DyedSudoku
 {
-	[Register ("InfoViewController")]
-	partial class InfoViewController
-	{
-		[Action ("done:")]
-		partial void done (MonoTouch.Foundation.NSObject sender);
-		
-		void ReleaseDesignerOutlets ()
-		{
-		}
-	}
+    [Register ("InfoViewController")]
+    partial class InfoViewController
+    {
+        [Action ("done:")]
+        partial void done(MonoTouch.Foundation.NSObject sender);
+
+        void ReleaseDesignerOutlets()
+        {
+        }
+    }
 }
