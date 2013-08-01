@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DyedSudoku
 {
@@ -6,7 +8,6 @@ namespace DyedSudoku
     {
         private const byte cellLineCount = 9;
         private const byte blockLineCount = 3;
-
         // Zero is left bottom couse CTM is inversed
         private byte[,] field;
 
@@ -28,18 +29,17 @@ namespace DyedSudoku
         private void InitField()
         {
             field = new byte[CellLineCount, CellLineCount];
-
-            for (byte i = 0; i < CellLineCount; i++)
-                for (byte j = 0; j < CellLineCount; j++)
-                    field[i, j] = (byte) ((i + j) % 9 + 1);
+            GameFieldFillHelper.Init(this);
         }
 
         public byte GetItem(byte x, byte y)
         {
-            if (x >= CellLineCount || y >= CellLineCount)
-                throw new ArgumentOutOfRangeException();
-
             return field[x, y];
+        }
+
+        public void SetItem(byte value, byte x, byte y)
+        {
+            field[x, y] = value;
         }
     }
 }
