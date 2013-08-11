@@ -14,12 +14,10 @@ namespace DyedSudoku
 
         public GameFieldView()
         {
-            InitDataSource();
         }
 
         public GameFieldView(IntPtr handle) : base(handle)
         {
-            InitDataSource();
         }
 
         public GameFieldView(GameFieldViewModel viewModel)
@@ -40,6 +38,9 @@ namespace DyedSudoku
         public override void Draw(RectangleF rect)
         {
             base.Draw(rect);
+
+            if (dataSource == null)
+                return;
 
             using (CGContext context = UIGraphics.GetCurrentContext())
                 dataSource.Draw(context);

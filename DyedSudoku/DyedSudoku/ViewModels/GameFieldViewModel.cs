@@ -17,11 +17,9 @@ namespace DyedSudoku
         private float cellWidth;
         private float blockHeight;
         private float blockWidth;
-
         private CGContext context;
-
-        private const float cellLeft = 10;
-        private const float cellBottom = 8;
+        private const float cellContentLeft = 10;
+        private const float cellContentBottom = 8;
 
         public GameFieldViewModel(RectangleF frame)
         {
@@ -50,8 +48,17 @@ namespace DyedSudoku
 
             SetCurrentContext(ctx);
 
+            if (Model.IsInitializing)
+            {
+                DrawBackground();
+                DrawCellsBackground();
+            }
+            else
+            {
+                DrawModel();
+            }
+
             DrawLines();
-            DrawModel();
             DrawFPS();
         }
 
@@ -63,8 +70,35 @@ namespace DyedSudoku
             context.SetDefaultTextSettings();
         }
 
+        private void DrawBackground()
+        {
+            context.SetFillEmptyItemColor();
+            context.AddRect(new RectangleF(0, 0, Frame.Width, Frame.Height));
+            context.DrawPath(CGPathDrawingMode.Fill);
+        }
+
+        private void DrawCellsBackground()
+        {
+            for (int i = 0; i < Model.CellLineCount; i++)
+                for (int j = 0; j < Model.CellLineCount; j++)
+                {
+                    if (Model.IsItemEmpty(i, j))
+                        continue;
+
+                    if (Model.GetItemVisible(i, j))
+                        context.SetFillVisibleItemColor();
+                    else
+                        context.SetFillInitializedItemColor();
+
+                    context.AddRect(new RectangleF(i * cellWidth, j * cellHeight, cellWidth, cellHeight));
+                    context.DrawPath(CGPathDrawingMode.Fill);
+                }
+        }
+
         private void DrawLines()
         {
+            context.SetDefaultLineSettings();
+
             DrawCellLines();
             DrawBlockLines();
         }
@@ -96,13 +130,14 @@ namespace DyedSudoku
         {
             context.SetDefaultTextSettings();
 
-            for (byte i = 0; i < Model.CellLineCount; i++)
-            {
-                for (byte j = 0; j < Model.CellLineCount; j++)
+            for (int i = 0; i < Model.CellLineCount; i++)
+                for (int j = 0; j < Model.CellLineCount; j++)
                 {
-                    context.ShowTextAtPoint(i * cellWidth + cellLeft, j * cellHeight + cellBottom, Model.GetItem(i, j).ToString());
+                    if (!Model.GetItemVisible(i, j))
+                        continue;
+
+                    context.ShowTextAtPoint(i * cellWidth + cellContentLeft, j * cellHeight + cellContentBottom, Model.GetItemNumber(i, j).ToString());
                 }
-            }
         }
 
         private void DrawFPS()

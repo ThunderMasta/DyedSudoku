@@ -44,5 +44,10 @@
   <ItemGroup>
     <Compile Include="FPSCounter.cs" />
     <Compile Include="Extensions\CGContextExt.cs" />
+    <Compile Include="Models\GameFieldModel.cs" />
+    <Compile Include="Helpers\GameFieldFillHelper.cs" />
+    <Compile Include="CellItem.cs" />
+    <Compile Include="Extensions\RandomExt.cs" />
+    <Compile Include="IndexPair.cs" />
   </ItemGroup>
 </Project>

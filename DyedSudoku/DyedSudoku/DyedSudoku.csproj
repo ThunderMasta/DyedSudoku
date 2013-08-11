@@ -89,8 +89,6 @@
     <Folder Include="Resources\" />
     <Folder Include="Views\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="Models\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -112,8 +110,6 @@
     </Compile>
     <Compile Include="Views\GameFieldView.cs" />
     <Compile Include="ViewModels\GameFieldViewModel.cs" />
-    <Compile Include="Models\GameFieldModel.cs" />
-    <Compile Include="Helpers\GameFieldFillHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainViewController.xib" />
