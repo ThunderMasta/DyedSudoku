@@ -7,12 +7,8 @@ namespace Common
 {
     public static class GameFieldFillHelper
     {
-        private static readonly List<sbyte> numberList = new List<sbyte> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-
-        static GameFieldFillHelper()
-        {
-
-        }
+        private const int maxVisibleNumbers = 32;
+        private const int maxTryVisibleCount = 200;
 
         public static void Init(GameFieldModel model)
         {
@@ -39,11 +35,13 @@ namespace Common
             {
             }
 
-            for (int k = 0; k < 10 && !InitVisible(model, rand); k++)
+            for (int k = 0; k < maxTryVisibleCount; k++)
             {
+                if (InitVisible(model, rand))
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         private static bool InitNumbers(GameFieldModel model, Random rand)
@@ -56,12 +54,16 @@ namespace Common
 
         private static bool SetNumbers(GameFieldModel model, Random rand)
         {
-            // Start init rows from left top corner
-            for (int j = model.CellLineCount - 1; j >= 0; j--)
-                for (int i = 0; i < model.CellLineCount; i++)
+            // Start init blocks from left top corner
+            for (int j = model.CellLineCount - 1; j >= 0; j -= model.BlockLineCount)
+                for (int i = 0; i < model.CellLineCount; i += model.BlockLineCount)
                 {
-                    if (!GenerateNumber(model, rand, i, j))
-                        return false;
+                    var blockPairs = model.GetBlockPairs(i, j);
+                    foreach (var pair in blockPairs)
+                    {
+                        if (!GenerateNumber(model, rand, pair.X, pair.Y))
+                            return false;
+                    }
                 }
 
             return true;
@@ -69,69 +71,40 @@ namespace Common
 
         private static bool GenerateNumber(GameFieldModel model, Random rand, int x, int y)
         {
-            var availableNumbers = GetAvailableNumbers(model, x, y);
-            sbyte? number = rand.ChooseV(availableNumbers);
+            var availableNumbers = GetHeuristicsAvailableNumbers(model, x, y);
+            sbyte number = rand.Choose(availableNumbers);
 
-            if (!number.HasValue)
-                return false;
+            model.SetItemNumber(number, x, y);
 
-            model.SetItemNumber(number.Value, x, y);
-
-            return true;
+            return !model.IsItemEmpty(x, y);
         }
 
-        private static IEnumerable<sbyte> GetAvailableNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
+        private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
         {
-            var cellRowNumbers = GetRowNumbers(model, x, y, isVisibleOnly);
-            var cellColumnNumbers = GetColumnNumbers(model, x, y, isVisibleOnly);
-            var cellBlockNumbers = GetBlockNumbers(model, x, y, isVisibleOnly);
+            var dict = GetBlockAvailableDict(model, x, y, isVisibleOnly);
+            var keyValuePair = dict.First(item => item.Key.X == x && item.Key.Y == y);
+            dict.Remove(keyValuePair.Key);
 
-            var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
-
-            return numberList.Except(alreadyGeneratedNumbers);
-        }
-
-        private static IEnumerable<sbyte> GetRowNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
-        {
-            for (int i = 0; i < x; i++)
+            foreach (var number in keyValuePair.Value)
             {
-                if (model.IsItemEmpty(i, y) || isVisibleOnly && !model.GetItemVisible(i, y))
-                    continue;
-
-                yield return model.GetItemNumber(i, y);
+                if (!dict.Any(item => item.Value.Contains(number)))
+                    return new[] { number };
             }
+
+            return keyValuePair.Value;
         }
 
-        private static IEnumerable<sbyte> GetColumnNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y, bool isVisibleOnly)
         {
-            for (int j = model.CellLineCount - 1; j > y; j--)
+            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
+            var blockPairs = model.GetBlockPairs(x, y);
+
+            foreach (var pair in blockPairs)
             {
-                if (model.IsItemEmpty(x, j) || isVisibleOnly && !model.GetItemVisible(x, j))
-                    continue;
-
-                yield return model.GetItemNumber(x, j);
+                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
             }
-        }
 
-        private static IEnumerable<sbyte> GetBlockNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
-        {
-            int xBlock = x / model.BlockLineCount;
-            int yBlock = y / model.BlockLineCount;
-
-            int blockColumn = xBlock * model.BlockLineCount;
-            int blockRow = yBlock * model.BlockLineCount;
-
-            for (int i = 0; i < model.BlockLineCount; i++)
-                for (int j = 0; j < model.BlockLineCount; j++)
-                {
-                    var xCell = blockColumn + i;
-                    var yCell = blockRow + j;
-
-                    if (model.IsItemEmpty(xCell, yCell) || isVisibleOnly && !model.GetItemVisible(xCell, yCell))
-                        continue;
-
-                    yield return model.GetItemNumber(xCell, yCell);
-                }
+            return dict;
         }
 
         private static bool InitVisible(GameFieldModel model, Random rand)
@@ -147,7 +120,7 @@ namespace Common
             do
             {
                 var hidePairs = GetAvailableToHideIndexPairs(model, pairs);
-                var pair = rand.ChooseC(hidePairs);
+                var pair = rand.Choose(hidePairs);
 
                 if (pair == null)
                     break;
@@ -158,7 +131,7 @@ namespace Common
             }
             while(true);
 
-            return pairs.Count < 39;
+            return pairs.Count <= maxVisibleNumbers;
         }
 
         private static IEnumerable<IndexPair> GetAllIndexPairs(GameFieldModel model)
@@ -174,8 +147,12 @@ namespace Common
         {
             foreach (var pair in pairs)
             {
-                if (GetAvailableNumbers(model, pair.X, pair.Y, true).Count() <= 1)
+                model.SetItemVisible(false, pair.X, pair.Y);
+
+                if (GetHeuristicsAvailableNumbers(model, pair.X, pair.Y, true).Count() <= 1)
                     yield return pair;
+
+                model.SetItemVisible(true, pair.X, pair.Y);
             }
         }
     }

@@ -10,6 +10,7 @@ namespace Common
         private const sbyte blockLineCount = 3;
         // Zero is left bottom couse CTM is inversed
         private CellItem[,] field;
+        private static readonly List<sbyte> numberList = new List<sbyte> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
         public sbyte CellLineCount
         {
@@ -19,21 +20,6 @@ namespace Common
         public sbyte BlockLineCount
         {
             get { return blockLineCount; }
-        }
-
-        public bool IsAnyZeroCell
-        {
-            get
-            {
-                for (int i = 0; i < CellLineCount; i++)
-                    for (int j = 0; j < CellLineCount; j++)
-                    {
-                        if (field[i, j].Number == 0)
-                            return true;
-                    }
-
-                return false;
-            }
         }
 
         private bool isInitializing;
@@ -106,6 +92,86 @@ namespace Common
         public void EndInitializing()
         {
             isInitializing = false;
+        }
+
+        public IEnumerable<sbyte> GetAvailableNumbers(int x, int y, bool isVisibleOnly)
+        {
+            return IsNeedCheckAvailableNumbers(x, y, isVisibleOnly)
+                    ? GetCheckedAvailableNumbers(x, y, isVisibleOnly)
+                    : GetDefaultAvailableNumbers(x, y);
+        }
+
+        private bool IsNeedCheckAvailableNumbers(int x, int y, bool isVisibleOnly)
+        {
+            return IsItemEmpty(x, y) || isVisibleOnly && !GetItemVisible(x, y);
+        }
+
+        private IEnumerable<sbyte> GetDefaultAvailableNumbers(int x, int y)
+        {
+            return new[] { GetItemNumber(x, y) };
+        }
+
+        private IEnumerable<sbyte> GetCheckedAvailableNumbers(int x, int y, bool isVisibleOnly)
+        {
+            var cellRowNumbers = GetRowNumbers(y, isVisibleOnly);
+            var cellColumnNumbers = GetColumnNumbers(x, isVisibleOnly);
+            var cellBlockNumbers = GetBlockNumbers(x, y, isVisibleOnly);
+
+            var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
+
+            return numberList.Except(alreadyGeneratedNumbers);
+        }
+
+        private IEnumerable<sbyte> GetRowNumbers(int y, bool isVisibleOnly)
+        {
+            for (int i = 0; i < CellLineCount; i++)
+            {
+                if (IsItemEmpty(i, y) || isVisibleOnly && !GetItemVisible(i, y))
+                    continue;
+
+                yield return GetItemNumber(i, y);
+            }
+        }
+
+        private IEnumerable<sbyte> GetColumnNumbers(int x, bool isVisibleOnly)
+        {
+            for (int j = CellLineCount - 1; j >= 0; j--)
+            {
+                if (IsItemEmpty(x, j) || isVisibleOnly && !GetItemVisible(x, j))
+                    continue;
+
+                yield return GetItemNumber(x, j);
+            }
+        }
+
+        private IEnumerable<sbyte> GetBlockNumbers(int x, int y, bool isVisibleOnly)
+        {
+            var pairs = GetBlockPairs(x, y);
+            foreach (var pair in pairs)
+            {
+                if (IsItemEmpty(pair.X, pair.Y) || isVisibleOnly && !GetItemVisible(pair.X, pair.Y))
+                    continue;
+
+                yield return GetItemNumber(pair.X, pair.Y);
+            }
+        }
+
+        public IEnumerable<IndexPair> GetBlockPairs(int x, int y)
+        {
+            int xBlock = x / BlockLineCount;
+            int yBlock = y / BlockLineCount;
+
+            int blockColumn = xBlock * BlockLineCount;
+            int blockRow = yBlock * BlockLineCount;
+
+            for (int i = 0; i < BlockLineCount; i++)
+                for (int j = 0; j < BlockLineCount; j++)
+                {
+                    var xCell = blockColumn + i;
+                    var yCell = blockRow + j;
+
+                    yield return new IndexPair(xCell, yCell);
+                }
         }
     }
 }
