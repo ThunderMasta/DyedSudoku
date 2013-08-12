@@ -49,5 +49,6 @@
     <Compile Include="CellItem.cs" />
     <Compile Include="Extensions\RandomExt.cs" />
     <Compile Include="IndexPair.cs" />
+    <Compile Include="Extensions\IEnumerableExt.cs" />
   </ItemGroup>
 </Project>

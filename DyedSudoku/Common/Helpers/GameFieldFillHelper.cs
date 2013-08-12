@@ -7,8 +7,8 @@ namespace Common
 {
     public static class GameFieldFillHelper
     {
-        private const int maxVisibleNumbers = 32;
-        private const int maxTryVisibleCount = 200;
+        private const int maxVisibleNumbers = 30;
+        private const int maxTryVisibleCount = 3;
 
         public static void Init(GameFieldModel model)
         {
@@ -20,28 +20,17 @@ namespace Common
         {
             model.BeginInitializing();
 
-            while (!InitModelInLoop(model))
-            {
-            }
-
-            model.EndInitializing();
-        }
-
-        private static bool InitModelInLoop(GameFieldModel model)
-        {
             var rand = new Random();
 
             while (!InitNumbers(model, rand))
             {
             }
 
-            for (int k = 0; k < maxTryVisibleCount; k++)
+            for (int k = 0; k < maxTryVisibleCount && !InitVisible(model, rand); k++)
             {
-                if (InitVisible(model, rand))
-                    return true;
             }
 
-            return false;
+            model.EndInitializing();
         }
 
         private static bool InitNumbers(GameFieldModel model, Random rand)
@@ -81,23 +70,83 @@ namespace Common
 
         private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
         {
-            var dict = GetBlockAvailableDict(model, x, y, isVisibleOnly);
-            var keyValuePair = dict.First(item => item.Key.X == x && item.Key.Y == y);
-            dict.Remove(keyValuePair.Key);
+            var blockDict = GetBlockAvailableDict(model, x, y, isVisibleOnly);
+            var available = GetAvailableByPairs(blockDict, x, y);
 
-            foreach (var number in keyValuePair.Value)
+            var rowDict = GetRowAvailableDict(model, y, isVisibleOnly);
+            available = available.Intersect(GetAvailableByPairs(rowDict, x, y));
+
+            var columnDict = GetColumnAvailableDict(model, x, isVisibleOnly);
+            available = available.Intersect(GetAvailableByPairs(columnDict, x, y));
+
+            return available;
+        }
+
+        private static IEnumerable<sbyte> GetAvailableByPairs(Dictionary<IndexPair, IEnumerable<sbyte>> dict, int x, int y)
+        {
+            bool isModified;
+
+            do
             {
-                if (!dict.Any(item => item.Value.Contains(number)))
-                    return new[] { number };
-            }
+                isModified = false;
+                foreach (var keyValuePair in dict.Where(item => item.Value.Count() > 1).ToDictionary(item => item.Key, item => item.Value))
+                {
+                    foreach (sbyte number in keyValuePair.Value)
+                    {
+                        if (!dict.Any(item => !item.Equals(keyValuePair) && item.Value.Contains(number)))
+                        {
+                            dict.Remove(keyValuePair.Key);
+                            dict.Add(keyValuePair.Key, number.Yield());
+                            isModified = true;
+                        }
+                    }
+                }
 
-            return keyValuePair.Value;
+                foreach (var singleValuePair in dict.Where(item => item.Value.Count() == 1).ToDictionary(item => item.Key, item => item.Value))
+                {
+                    foreach (var keyValuePair in dict.Where(item => !item.Equals(singleValuePair) && item.Value.Contains(singleValuePair.Value.First())).ToDictionary(item => item.Key, item => item.Value))
+                    {
+                        dict.Remove(keyValuePair.Key);
+                        dict.Add(keyValuePair.Key, keyValuePair.Value.Except(singleValuePair.Value));
+                        isModified = true;
+                    }
+                }
+            }
+            while(isModified);
+
+            return dict.First(item => item.Key.X == x && item.Key.Y == y).Value;
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y, bool isVisibleOnly)
         {
             var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
             var blockPairs = model.GetBlockPairs(x, y);
+
+            foreach (var pair in blockPairs)
+            {
+                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
+            }
+
+            return dict;
+        }
+
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, int y, bool isVisibleOnly)
+        {
+            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
+            var blockPairs = model.GetRowPairs(y);
+
+            foreach (var pair in blockPairs)
+            {
+                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
+            }
+
+            return dict;
+        }
+
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, int x, bool isVisibleOnly)
+        {
+            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
+            var blockPairs = model.GetColumnPairs(x);
 
             foreach (var pair in blockPairs)
             {

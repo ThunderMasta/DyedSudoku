@@ -108,7 +108,7 @@ namespace Common
 
         private IEnumerable<sbyte> GetDefaultAvailableNumbers(int x, int y)
         {
-            return new[] { GetItemNumber(x, y) };
+            return GetItemNumber(x, y).Yield();
         }
 
         private IEnumerable<sbyte> GetCheckedAvailableNumbers(int x, int y, bool isVisibleOnly)
@@ -172,6 +172,22 @@ namespace Common
 
                     yield return new IndexPair(xCell, yCell);
                 }
+        }
+
+        public IEnumerable<IndexPair> GetRowPairs(int y)
+        {
+            for (int i = 0; i < CellLineCount; i++)
+            {
+                yield return new IndexPair(i, y);
+            }
+        }
+
+        public IEnumerable<IndexPair> GetColumnPairs(int x)
+        {
+            for (int j = CellLineCount - 1; j >= 0; j--)
+            {
+                yield return new IndexPair(x, j);
+            }
         }
     }
 }
