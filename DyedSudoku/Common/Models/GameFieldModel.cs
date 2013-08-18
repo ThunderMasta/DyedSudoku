@@ -96,12 +96,12 @@ namespace Common
 
         public IEnumerable<sbyte> GetAvailableNumbers(int x, int y, bool isVisibleOnly)
         {
-            return IsNeedCheckAvailableNumbers(x, y, isVisibleOnly)
+            return IsItemNotAvailable(x, y, isVisibleOnly)
                     ? GetCheckedAvailableNumbers(x, y, isVisibleOnly)
                     : GetDefaultAvailableNumbers(x, y);
         }
 
-        private bool IsNeedCheckAvailableNumbers(int x, int y, bool isVisibleOnly)
+        private bool IsItemNotAvailable(int x, int y, bool isVisibleOnly)
         {
             return IsItemEmpty(x, y) || isVisibleOnly && !GetItemVisible(x, y);
         }
@@ -124,32 +124,24 @@ namespace Common
 
         private IEnumerable<sbyte> GetRowNumbers(int y, bool isVisibleOnly)
         {
-            for (int i = 0; i < CellLineCount; i++)
-            {
-                if (IsItemEmpty(i, y) || isVisibleOnly && !GetItemVisible(i, y))
-                    continue;
-
-                yield return GetItemNumber(i, y);
-            }
+            return GetAvailableNumbersByPairs(GetRowPairs(y), isVisibleOnly);
         }
 
         private IEnumerable<sbyte> GetColumnNumbers(int x, bool isVisibleOnly)
         {
-            for (int j = CellLineCount - 1; j >= 0; j--)
-            {
-                if (IsItemEmpty(x, j) || isVisibleOnly && !GetItemVisible(x, j))
-                    continue;
-
-                yield return GetItemNumber(x, j);
-            }
+            return GetAvailableNumbersByPairs(GetColumnPairs(x), isVisibleOnly);
         }
 
         private IEnumerable<sbyte> GetBlockNumbers(int x, int y, bool isVisibleOnly)
         {
-            var pairs = GetBlockPairs(x, y);
+            return GetAvailableNumbersByPairs(GetBlockPairs(x, y), isVisibleOnly);
+        }
+
+        private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs, bool isVisibleOnly)
+        {
             foreach (var pair in pairs)
             {
-                if (IsItemEmpty(pair.X, pair.Y) || isVisibleOnly && !GetItemVisible(pair.X, pair.Y))
+                if (IsItemNotAvailable(pair.X, pair.Y, isVisibleOnly))
                     continue;
 
                 yield return GetItemNumber(pair.X, pair.Y);

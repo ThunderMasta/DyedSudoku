@@ -71,43 +71,47 @@ namespace Common
         private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
         {
             var blockDict = GetBlockAvailableDict(model, x, y, isVisibleOnly);
-            var available = GetAvailableByPairs(blockDict, x, y);
+            var available = GetAvailableByDict(blockDict, x, y);
 
             var rowDict = GetRowAvailableDict(model, y, isVisibleOnly);
-            available = available.Intersect(GetAvailableByPairs(rowDict, x, y));
+            available = available.Intersect(GetAvailableByDict(rowDict, x, y));
 
             var columnDict = GetColumnAvailableDict(model, x, isVisibleOnly);
-            available = available.Intersect(GetAvailableByPairs(columnDict, x, y));
+            available = available.Intersect(GetAvailableByDict(columnDict, x, y));
 
             return available;
         }
 
-        private static IEnumerable<sbyte> GetAvailableByPairs(Dictionary<IndexPair, IEnumerable<sbyte>> dict, int x, int y)
+        private static IEnumerable<sbyte> GetAvailableByDict(Dictionary<IndexPair, IEnumerable<sbyte>> dict, int x, int y)
         {
             bool isModified;
 
             do
             {
                 isModified = false;
-                foreach (var keyValuePair in dict.Where(item => item.Value.Count() > 1).ToDictionary(item => item.Key, item => item.Value))
+
+                var manyValuesItems = dict.Where(item => item.Value.Count() > 1).ToList();
+                foreach (var dictItem in manyValuesItems)
                 {
-                    foreach (sbyte number in keyValuePair.Value)
+                    foreach (sbyte number in dictItem.Value)
                     {
-                        if (!dict.Any(item => !item.Equals(keyValuePair) && item.Value.Contains(number)))
+                        if (!dict.Any(item => !item.Equals(dictItem) && item.Value.Contains(number)))
                         {
-                            dict.Remove(keyValuePair.Key);
-                            dict.Add(keyValuePair.Key, number.Yield());
+                            dict.Remove(dictItem.Key);
+                            dict.Add(dictItem.Key, number.Yield());
                             isModified = true;
                         }
                     }
                 }
 
-                foreach (var singleValuePair in dict.Where(item => item.Value.Count() == 1).ToDictionary(item => item.Key, item => item.Value))
+                var singleValueItems = dict.Where(item => item.Value.Count() == 1).ToList();
+                foreach (var singleDictItem in singleValueItems)
                 {
-                    foreach (var keyValuePair in dict.Where(item => !item.Equals(singleValuePair) && item.Value.Contains(singleValuePair.Value.First())).ToDictionary(item => item.Key, item => item.Value))
+                    var itemsContainsSingle = dict.Where(item => !item.Equals(singleDictItem) && item.Value.Contains(singleDictItem.Value.First())).ToList();
+                    foreach (var dictItem in itemsContainsSingle)
                     {
-                        dict.Remove(keyValuePair.Key);
-                        dict.Add(keyValuePair.Key, keyValuePair.Value.Except(singleValuePair.Value));
+                        dict.Remove(dictItem.Key);
+                        dict.Add(dictItem.Key, dictItem.Value.Except(singleDictItem.Value));
                         isModified = true;
                     }
                 }
@@ -119,36 +123,27 @@ namespace Common
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y, bool isVisibleOnly)
         {
-            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
             var blockPairs = model.GetBlockPairs(x, y);
-
-            foreach (var pair in blockPairs)
-            {
-                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
-            }
-
-            return dict;
+            return GetAvailableDictByPairs(model, blockPairs, isVisibleOnly);
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, int y, bool isVisibleOnly)
         {
-            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
-            var blockPairs = model.GetRowPairs(y);
-
-            foreach (var pair in blockPairs)
-            {
-                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
-            }
-
-            return dict;
+            var rowPairs = model.GetRowPairs(y);
+            return GetAvailableDictByPairs(model, rowPairs, isVisibleOnly);
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, int x, bool isVisibleOnly)
         {
-            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
-            var blockPairs = model.GetColumnPairs(x);
+            var columnPairs = model.GetColumnPairs(x);
+            return GetAvailableDictByPairs(model, columnPairs, isVisibleOnly);
+        }
 
-            foreach (var pair in blockPairs)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetAvailableDictByPairs(GameFieldModel model, IEnumerable<IndexPair> pairs, bool isVisibleOnly)
+        {
+            var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
+
+            foreach (var pair in pairs)
             {
                 dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
             }
