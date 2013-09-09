@@ -9,7 +9,7 @@ namespace DyedSudoku
     public partial class PlayLocalViewController : UIViewController
     {
         // Need update thread for custom animation
-        private Thread updateThread;
+        private volatile bool needUpdateGameField;
 
         public PlayLocalViewController() : base ("PlayLocalViewController", null)
         {
@@ -29,14 +29,13 @@ namespace DyedSudoku
 
         private void StartUpdateThread()
         {
-            updateThread = new Thread(UpdateGameField);
-            updateThread.Start();
+            needUpdateGameField = true;
+            ThreadPool.QueueUserWorkItem(UpdateGameField);
         }
 
         private void StopUpdateThread()
         {
-            updateThread.Abort();
-            updateThread = null;
+            needUpdateGameField = false;
         }
 
         public override void ViewDidLoad()
@@ -64,9 +63,9 @@ namespace DyedSudoku
                 Done(this, EventArgs.Empty);
         }
 
-        private void UpdateGameField()
+        private void UpdateGameField(object obj)
         {
-            while (true)
+            while (needUpdateGameField)
             {
                 //Sleep for 60 fps
                 Thread.Sleep(15);

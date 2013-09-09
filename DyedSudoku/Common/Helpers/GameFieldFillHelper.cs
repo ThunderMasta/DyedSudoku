@@ -84,41 +84,51 @@ namespace Common
 
         private static IEnumerable<sbyte> GetAvailableByDict(Dictionary<IndexPair, IEnumerable<sbyte>> dict, int x, int y)
         {
-            bool isModified;
-
-            do
+            while (SetNumbersIfSingle(dict) || RemoveSingleNumbers(dict))
             {
-                isModified = false;
+            }
 
-                var manyValuesItems = dict.Where(item => item.Value.Count() > 1).ToList();
-                foreach (var dictItem in manyValuesItems)
-                {
-                    foreach (sbyte number in dictItem.Value)
-                    {
-                        if (!dict.Any(item => !item.Equals(dictItem) && item.Value.Contains(number)))
-                        {
-                            dict.Remove(dictItem.Key);
-                            dict.Add(dictItem.Key, number.Yield());
-                            isModified = true;
-                        }
-                    }
-                }
+            return dict.First(item => item.Key.X == x && item.Key.Y == y).Value;
+        }
 
-                var singleValueItems = dict.Where(item => item.Value.Count() == 1).ToList();
-                foreach (var singleDictItem in singleValueItems)
+        private static bool SetNumbersIfSingle(Dictionary<IndexPair, IEnumerable<sbyte>> dict)
+        {
+            var isModified = false;
+
+            var manyValuesItems = dict.Where(item => item.Value.Count() > 1).ToList();
+            foreach (var dictItem in manyValuesItems)
+            {
+                foreach (sbyte number in dictItem.Value)
                 {
-                    var itemsContainsSingle = dict.Where(item => !item.Equals(singleDictItem) && item.Value.Contains(singleDictItem.Value.First())).ToList();
-                    foreach (var dictItem in itemsContainsSingle)
+                    if (!dict.Any(item => !item.Equals(dictItem) && item.Value.Contains(number)))
                     {
                         dict.Remove(dictItem.Key);
-                        dict.Add(dictItem.Key, dictItem.Value.Except(singleDictItem.Value));
+                        dict.Add(dictItem.Key, number.Yield());
                         isModified = true;
                     }
                 }
             }
-            while(isModified);
 
-            return dict.First(item => item.Key.X == x && item.Key.Y == y).Value;
+            return isModified;
+        }
+
+        private static bool RemoveSingleNumbers(Dictionary<IndexPair, IEnumerable<sbyte>> dict)
+        {
+            var isModified = false;
+
+            var singleValueItems = dict.Where(item => item.Value.Count() == 1).ToList();
+            foreach (var singleDictItem in singleValueItems)
+            {
+                var itemsContainsSingle = dict.Where(item => !item.Equals(singleDictItem) && item.Value.Contains(singleDictItem.Value.First())).ToList();
+                foreach (var dictItem in itemsContainsSingle)
+                {
+                    dict.Remove(dictItem.Key);
+                    dict.Add(dictItem.Key, dictItem.Value.Except(singleDictItem.Value));
+                    isModified = true;
+                }
+            }
+
+            return isModified;
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y, bool isVisibleOnly)
