@@ -136,7 +136,7 @@ namespace DyedSudoku
                     if (!Model.GetItemVisible(i, j))
                         continue;
 
-                    context.ShowTextAtPoint(i * cellWidth + cellContentLeft, j * cellHeight + cellContentBottom, Model.GetItemNumber(i, j).ToString());
+                    context.DrawText(Model.GetItemNumber(i, j).ToString(), i * cellWidth + cellContentLeft, j * cellHeight + cellContentBottom);
                 }
         }
 
@@ -144,8 +144,8 @@ namespace DyedSudoku
         {
             context.SetDefaultInfoTextSettings();
 
-            context.ShowTextAtPoint(Frame.Width - 100, Frame.Height - 20, DateTime.Now.ToLongTimeString());
-            context.ShowTextAtPoint(Frame.Width - 30, Frame.Height - 20, fpsCounter.GetFPS().ToString());
+            context.DrawInfoText(DateTime.Now.ToLongTimeString(), Frame.Width - 100, Frame.Height - 20);
+            context.DrawInfoText(fpsCounter.GetFPS().ToString(), Frame.Width - 30, Frame.Height - 20);
         }
     }
 }
