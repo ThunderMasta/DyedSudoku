@@ -12,8 +12,10 @@ namespace Common
 
         public static void Init(GameFieldModel model)
         {
-            new Thread(() => {
-                InitModel(model);}).Start();
+            new Thread(() =>
+            {
+                InitModel(model);
+            }).Start();
         }
 
         private static void InitModel(GameFieldModel model)
@@ -43,17 +45,11 @@ namespace Common
 
         private static bool SetNumbers(GameFieldModel model, Random rand)
         {
-            // Start init blocks from left top corner
-            for (int j = model.CellLineCount - 1; j >= 0; j -= model.BlockLineCount)
-                for (int i = 0; i < model.CellLineCount; i += model.BlockLineCount)
-                {
-                    var blockPairs = model.GetBlockPairs(i, j);
-                    foreach (var pair in blockPairs)
-                    {
-                        if (!GenerateNumber(model, rand, pair.X, pair.Y))
-                            return false;
-                    }
-                }
+            foreach (var pair in model.GetBlockOrderedPairs())
+            {
+                if (!GenerateNumber(model, rand, pair.X, pair.Y))
+                    return false;
+            }
 
             return true;
         }
@@ -68,15 +64,15 @@ namespace Common
             return !model.IsItemEmpty(x, y);
         }
 
-        private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y, bool isVisibleOnly = false)
+        private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y)
         {
-            var blockDict = GetBlockAvailableDict(model, x, y, isVisibleOnly);
+            var blockDict = GetBlockAvailableDict(model, x, y);
             var available = GetAvailableByDict(blockDict, x, y);
 
-            var rowDict = GetRowAvailableDict(model, y, isVisibleOnly);
+            var rowDict = GetRowAvailableDict(model, y);
             available = available.Intersect(GetAvailableByDict(rowDict, x, y));
 
-            var columnDict = GetColumnAvailableDict(model, x, isVisibleOnly);
+            var columnDict = GetColumnAvailableDict(model, x);
             available = available.Intersect(GetAvailableByDict(columnDict, x, y));
 
             return available;
@@ -131,31 +127,31 @@ namespace Common
             return isModified;
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y, bool isVisibleOnly)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y)
         {
             var blockPairs = model.GetBlockPairs(x, y);
-            return GetAvailableDictByPairs(model, blockPairs, isVisibleOnly);
+            return GetAvailableDictByPairs(model, blockPairs);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, int y, bool isVisibleOnly)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, int y)
         {
             var rowPairs = model.GetRowPairs(y);
-            return GetAvailableDictByPairs(model, rowPairs, isVisibleOnly);
+            return GetAvailableDictByPairs(model, rowPairs);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, int x, bool isVisibleOnly)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, int x)
         {
             var columnPairs = model.GetColumnPairs(x);
-            return GetAvailableDictByPairs(model, columnPairs, isVisibleOnly);
+            return GetAvailableDictByPairs(model, columnPairs);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetAvailableDictByPairs(GameFieldModel model, IEnumerable<IndexPair> pairs, bool isVisibleOnly)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetAvailableDictByPairs(GameFieldModel model, IEnumerable<IndexPair> pairs)
         {
             var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
 
             foreach (var pair in pairs)
             {
-                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y, isVisibleOnly));
+                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y));
             }
 
             return dict;
@@ -170,7 +166,7 @@ namespace Common
 
         private static bool HideItems(GameFieldModel model, Random rand)
         {
-            var pairs = GetAllIndexPairs(model).ToList();
+            var pairs = model.GetAllPairs().ToList();
             do
             {
                 var hidePairs = GetAvailableToHideIndexPairs(model, pairs);
@@ -188,22 +184,13 @@ namespace Common
             return pairs.Count <= maxVisibleNumbers;
         }
 
-        private static IEnumerable<IndexPair> GetAllIndexPairs(GameFieldModel model)
-        {
-            for (int i = 0; i < model.CellLineCount; i++)
-                for (int j = 0; j < model.CellLineCount; j++)
-                {
-                    yield return new IndexPair(i, j);
-                }
-        }
-
         private static IEnumerable<IndexPair> GetAvailableToHideIndexPairs(GameFieldModel model, IEnumerable<IndexPair> pairs)
         {
             foreach (var pair in pairs)
             {
                 model.SetItemVisible(false, pair.X, pair.Y);
 
-                if (GetHeuristicsAvailableNumbers(model, pair.X, pair.Y, true).Count() <= 1)
+                if (GetHeuristicsAvailableNumbers(model, pair.X, pair.Y).Count() <= 1)
                     yield return pair;
 
                 model.SetItemVisible(true, pair.X, pair.Y);

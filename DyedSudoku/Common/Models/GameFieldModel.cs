@@ -94,16 +94,16 @@ namespace Common
             isInitializing = false;
         }
 
-        public IEnumerable<sbyte> GetAvailableNumbers(int x, int y, bool isVisibleOnly)
+        public IEnumerable<sbyte> GetAvailableNumbers(int x, int y)
         {
-            return IsItemNotAvailable(x, y, isVisibleOnly)
-                    ? GetCheckedAvailableNumbers(x, y, isVisibleOnly)
+            return IsItemNotAvailable(x, y)
+                    ? GetCheckedAvailableNumbers(x, y)
                     : GetDefaultAvailableNumbers(x, y);
         }
 
-        private bool IsItemNotAvailable(int x, int y, bool isVisibleOnly)
+        private bool IsItemNotAvailable(int x, int y)
         {
-            return IsItemEmpty(x, y) || isVisibleOnly && !GetItemVisible(x, y);
+            return IsItemEmpty(x, y) || !GetItemVisible(x, y);
         }
 
         private IEnumerable<sbyte> GetDefaultAvailableNumbers(int x, int y)
@@ -111,37 +111,37 @@ namespace Common
             return GetItemNumber(x, y).Yield();
         }
 
-        private IEnumerable<sbyte> GetCheckedAvailableNumbers(int x, int y, bool isVisibleOnly)
+        private IEnumerable<sbyte> GetCheckedAvailableNumbers(int x, int y)
         {
-            var cellRowNumbers = GetRowNumbers(y, isVisibleOnly);
-            var cellColumnNumbers = GetColumnNumbers(x, isVisibleOnly);
-            var cellBlockNumbers = GetBlockNumbers(x, y, isVisibleOnly);
+            var cellRowNumbers = GetRowNumbers(y);
+            var cellColumnNumbers = GetColumnNumbers(x);
+            var cellBlockNumbers = GetBlockNumbers(x, y);
 
             var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
 
             return numberList.Except(alreadyGeneratedNumbers);
         }
 
-        private IEnumerable<sbyte> GetRowNumbers(int y, bool isVisibleOnly)
+        private IEnumerable<sbyte> GetRowNumbers(int y)
         {
-            return GetAvailableNumbersByPairs(GetRowPairs(y), isVisibleOnly);
+            return GetAvailableNumbersByPairs(GetRowPairs(y));
         }
 
-        private IEnumerable<sbyte> GetColumnNumbers(int x, bool isVisibleOnly)
+        private IEnumerable<sbyte> GetColumnNumbers(int x)
         {
-            return GetAvailableNumbersByPairs(GetColumnPairs(x), isVisibleOnly);
+            return GetAvailableNumbersByPairs(GetColumnPairs(x));
         }
 
-        private IEnumerable<sbyte> GetBlockNumbers(int x, int y, bool isVisibleOnly)
+        private IEnumerable<sbyte> GetBlockNumbers(int x, int y)
         {
-            return GetAvailableNumbersByPairs(GetBlockPairs(x, y), isVisibleOnly);
+            return GetAvailableNumbersByPairs(GetBlockPairs(x, y));
         }
 
-        private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs, bool isVisibleOnly)
+        private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs)
         {
             foreach (var pair in pairs)
             {
-                if (IsItemNotAvailable(pair.X, pair.Y, isVisibleOnly))
+                if (IsItemNotAvailable(pair.X, pair.Y))
                     continue;
 
                 yield return GetItemNumber(pair.X, pair.Y);
@@ -179,6 +179,28 @@ namespace Common
             for (int j = CellLineCount - 1; j >= 0; j--)
             {
                 yield return new IndexPair(x, j);
+            }
+        }
+        
+        public IEnumerable<IndexPair> GetBlockOrderedPairs()
+        {
+            var result = new List<IndexPair>();
+
+            for (int j = CellLineCount - 1; j >= 0; j -= BlockLineCount)
+                for (int i = 0; i < CellLineCount; i += BlockLineCount)
+            {
+                result.AddRange(GetBlockPairs(i, j));
+            }
+
+            return result;
+        }
+        
+        public IEnumerable<IndexPair> GetAllPairs()
+        {
+            for (int i = 0; i < CellLineCount; i++)
+                for (int j = 0; j < CellLineCount; j++)
+            {
+                yield return new IndexPair(i, j);
             }
         }
     }
