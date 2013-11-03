@@ -101,16 +101,16 @@ namespace Common
             isInitializing = false;
         }
 
-        public IEnumerable<sbyte> GetAvailableNumbers(IndexPair pair)
+        public IEnumerable<sbyte> GetAvailableNumbers(IndexPair pair, IndexPair checkedPair)
         {
-            return IsItemNotAvailable(pair)
-                    ? GetCheckedAvailableNumbers(pair)
+            return IsItemNotAvailable(pair, checkedPair)
+                    ? GetCheckedAvailableNumbers(pair, checkedPair)
                     : GetDefaultAvailableNumbers(pair);
         }
 
-        private bool IsItemNotAvailable(IndexPair pair)
+        private bool IsItemNotAvailable(IndexPair pair, IndexPair checkedPair)
         {
-            return IsItemEmpty(pair) || !GetItemVisible(pair);
+            return IsItemEmpty(pair) || !GetItemVisible(pair) || checkedPair.X == pair.X && checkedPair.Y == pair.Y;
         }
 
         private IEnumerable<sbyte> GetDefaultAvailableNumbers(IndexPair pair)
@@ -118,37 +118,37 @@ namespace Common
             return GetItemNumber(pair).Yield();
         }
 
-        private IEnumerable<sbyte> GetCheckedAvailableNumbers(IndexPair pair)
+        private IEnumerable<sbyte> GetCheckedAvailableNumbers(IndexPair pair, IndexPair checkedPair)
         {
-            var cellRowNumbers = GetRowNumbers(pair);
-            var cellColumnNumbers = GetColumnNumbers(pair);
-            var cellBlockNumbers = GetBlockNumbers(pair);
+            var cellRowNumbers = GetRowNumbers(pair, checkedPair);
+            var cellColumnNumbers = GetColumnNumbers(pair, checkedPair);
+            var cellBlockNumbers = GetBlockNumbers(pair, checkedPair);
 
             var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
 
             return numberList.Except(alreadyGeneratedNumbers);
         }
 
-        private IEnumerable<sbyte> GetRowNumbers(IndexPair pair)
+        private IEnumerable<sbyte> GetRowNumbers(IndexPair pair, IndexPair checkedPair)
         {
-            return GetAvailableNumbersByPairs(GetRowPairs(pair));
+            return GetAvailableNumbersByPairs(GetRowPairs(pair), checkedPair);
         }
 
-        private IEnumerable<sbyte> GetColumnNumbers(IndexPair pair)
+        private IEnumerable<sbyte> GetColumnNumbers(IndexPair pair, IndexPair checkedPair)
         {
-            return GetAvailableNumbersByPairs(GetColumnPairs(pair));
+            return GetAvailableNumbersByPairs(GetColumnPairs(pair), checkedPair);
         }
 
-        private IEnumerable<sbyte> GetBlockNumbers(IndexPair pair)
+        private IEnumerable<sbyte> GetBlockNumbers(IndexPair pair, IndexPair checkedPair)
         {
-            return GetAvailableNumbersByPairs(GetBlockPairs(pair));
+            return GetAvailableNumbersByPairs(GetBlockPairs(pair), checkedPair);
         }
 
-        private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs)
+        private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs, IndexPair checkedPair)
         {
             foreach (var pair in pairs)
             {
-                if (IsItemNotAvailable(pair))
+                if (IsItemNotAvailable(pair, checkedPair))
                     continue;
 
                 yield return GetItemNumber(pair);

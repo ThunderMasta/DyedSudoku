@@ -84,7 +84,7 @@ namespace Common
             {
             }
 
-            return dict.First(item => item.Key.Equals(pair)).Value;
+            return dict.First(item => item.Key.X == pair.X && item.Key.Y == pair.Y).Value;
         }
 
         private static bool SetNumbersIfSingle(Dictionary<IndexPair, IEnumerable<sbyte>> dict)
@@ -130,28 +130,28 @@ namespace Common
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, IndexPair pair)
         {
             var blockPairs = model.GetBlockPairs(pair);
-            return GetAvailableDictByPairs(model, blockPairs);
+            return GetAvailableDictByPairs(model, blockPairs, pair);
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, IndexPair pair)
         {
             var rowPairs = model.GetRowPairs(pair);
-            return GetAvailableDictByPairs(model, rowPairs);
+            return GetAvailableDictByPairs(model, rowPairs, pair);
         }
 
         private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, IndexPair pair)
         {
             var columnPairs = model.GetColumnPairs(pair);
-            return GetAvailableDictByPairs(model, columnPairs);
+            return GetAvailableDictByPairs(model, columnPairs, pair);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetAvailableDictByPairs(GameFieldModel model, IEnumerable<IndexPair> pairs)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetAvailableDictByPairs(GameFieldModel model, IEnumerable<IndexPair> pairs, IndexPair checkedPair)
         {
             var dict = new Dictionary<IndexPair, IEnumerable<sbyte>>();
 
             foreach (var pair in pairs)
             {
-                dict.Add(pair, model.GetAvailableNumbers(pair));
+                dict.Add(pair, model.GetAvailableNumbers(pair, checkedPair));
             }
 
             return dict;
@@ -187,13 +187,9 @@ namespace Common
         private static IEnumerable<IndexPair> GetAvailableToHideIndexPairs(GameFieldModel model, IEnumerable<IndexPair> pairs)
         {
             foreach (var pair in pairs)
-            {
-                model.SetItemVisible(pair, false);
-
+            {                             
                 if (GetHeuristicsAvailableNumbers(model, pair).Count() <= 1)
                     yield return pair;
-
-                model.SetItemVisible(pair, true);
             }
         }
     }

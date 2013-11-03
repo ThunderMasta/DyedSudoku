@@ -12,19 +12,6 @@ namespace Common
             X = x;
             Y = y;
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-
-            if (obj.GetType() != GetType())
-                return false;
-
-            var second = (IndexPair)obj;
-
-            return X == second.X && Y == second.Y;
-        }
     }
 }
 
