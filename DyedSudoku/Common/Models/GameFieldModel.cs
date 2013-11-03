@@ -26,7 +26,7 @@ namespace Common
 
         public bool IsInitializing
         { 
-            get{ return isInitializing;}
+            get{ return isInitializing; }
         }
 
         public GameFieldModel()
@@ -38,50 +38,57 @@ namespace Common
         {
             field = new CellItem[CellLineCount, CellLineCount];
 
-            for (int i = 0; i < CellLineCount; i++)
-                for (int j = 0; j < CellLineCount; j++)
-                    field[i, j] = new CellItem();
+            foreach (var pair in GetAllPairs())
+                field[pair.X, pair.Y] = new CellItem();
 
             GameFieldFillHelper.Init(this);
         }
 
-        public sbyte GetItemNumber(int x, int y)
+        public sbyte GetItemNumber(IndexPair pair)
         {
-            return field[x, y].Number;
+            return field[pair.X, pair.Y].Number;
         }
 
-        public void SetItemNumber(sbyte value, int x, int y)
+        public void SetItemNumber(IndexPair pair, sbyte value)
         {
-            field[x, y].Number = value;
+            field[pair.X, pair.Y].Number = value;
         }
 
-        public bool GetItemVisible(int x, int y)
+        public bool GetItemVisible(IndexPair pair)
         {
-            return field[x, y].IsVisible;
+            return field[pair.X, pair.Y].IsVisible;
         }
 
-        public void SetItemVisible(bool isVisible, int x, int y)
+        public void SetItemVisible(IndexPair pair, bool isVisible)
         {
-            field[x, y].IsVisible = isVisible;
+            field[pair.X, pair.Y].IsVisible = isVisible;
         }
 
-        public bool IsItemEmpty(int x, int y)
+        public bool IsItemEmpty(IndexPair pair)
         {
-            return field[x, y].IsEmpty;
+            return field[pair.X, pair.Y].IsEmpty;
         }
 
         public void ClearNumbers()
         {
-            for (int i = 0; i < CellLineCount; i++)
-                for (int j = 0; j < CellLineCount; j++)
-                    field[i, j].ResetNumber();
+            foreach (var pair in GetAllPairs())
+                ResetNumber(pair);
         }
 
         public void ClearVisible()
         {
-            for (int i = 0; i < CellLineCount; i++)
-                for (int j = 0; j < CellLineCount; j++)
-                    field[i, j].ResetIsVisible();
+            foreach (var pair in GetAllPairs())
+                ResetIsVisible(pair);
+        }
+
+        private void ResetNumber(IndexPair pair)
+        {
+            field[pair.X, pair.Y].ResetNumber();
+        }
+
+        private void ResetIsVisible(IndexPair pair)
+        {
+            field[pair.X, pair.Y].ResetIsVisible();
         }
 
         public void BeginInitializing()
@@ -94,64 +101,64 @@ namespace Common
             isInitializing = false;
         }
 
-        public IEnumerable<sbyte> GetAvailableNumbers(int x, int y)
+        public IEnumerable<sbyte> GetAvailableNumbers(IndexPair pair)
         {
-            return IsItemNotAvailable(x, y)
-                    ? GetCheckedAvailableNumbers(x, y)
-                    : GetDefaultAvailableNumbers(x, y);
+            return IsItemNotAvailable(pair)
+                    ? GetCheckedAvailableNumbers(pair)
+                    : GetDefaultAvailableNumbers(pair);
         }
 
-        private bool IsItemNotAvailable(int x, int y)
+        private bool IsItemNotAvailable(IndexPair pair)
         {
-            return IsItemEmpty(x, y) || !GetItemVisible(x, y);
+            return IsItemEmpty(pair) || !GetItemVisible(pair);
         }
 
-        private IEnumerable<sbyte> GetDefaultAvailableNumbers(int x, int y)
+        private IEnumerable<sbyte> GetDefaultAvailableNumbers(IndexPair pair)
         {
-            return GetItemNumber(x, y).Yield();
+            return GetItemNumber(pair).Yield();
         }
 
-        private IEnumerable<sbyte> GetCheckedAvailableNumbers(int x, int y)
+        private IEnumerable<sbyte> GetCheckedAvailableNumbers(IndexPair pair)
         {
-            var cellRowNumbers = GetRowNumbers(y);
-            var cellColumnNumbers = GetColumnNumbers(x);
-            var cellBlockNumbers = GetBlockNumbers(x, y);
+            var cellRowNumbers = GetRowNumbers(pair);
+            var cellColumnNumbers = GetColumnNumbers(pair);
+            var cellBlockNumbers = GetBlockNumbers(pair);
 
             var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
 
             return numberList.Except(alreadyGeneratedNumbers);
         }
 
-        private IEnumerable<sbyte> GetRowNumbers(int y)
+        private IEnumerable<sbyte> GetRowNumbers(IndexPair pair)
         {
-            return GetAvailableNumbersByPairs(GetRowPairs(y));
+            return GetAvailableNumbersByPairs(GetRowPairs(pair));
         }
 
-        private IEnumerable<sbyte> GetColumnNumbers(int x)
+        private IEnumerable<sbyte> GetColumnNumbers(IndexPair pair)
         {
-            return GetAvailableNumbersByPairs(GetColumnPairs(x));
+            return GetAvailableNumbersByPairs(GetColumnPairs(pair));
         }
 
-        private IEnumerable<sbyte> GetBlockNumbers(int x, int y)
+        private IEnumerable<sbyte> GetBlockNumbers(IndexPair pair)
         {
-            return GetAvailableNumbersByPairs(GetBlockPairs(x, y));
+            return GetAvailableNumbersByPairs(GetBlockPairs(pair));
         }
 
         private IEnumerable<sbyte> GetAvailableNumbersByPairs(IEnumerable<IndexPair> pairs)
         {
             foreach (var pair in pairs)
             {
-                if (IsItemNotAvailable(pair.X, pair.Y))
+                if (IsItemNotAvailable(pair))
                     continue;
 
-                yield return GetItemNumber(pair.X, pair.Y);
+                yield return GetItemNumber(pair);
             }
         }
 
-        public IEnumerable<IndexPair> GetBlockPairs(int x, int y)
+        public IEnumerable<IndexPair> GetBlockPairs(IndexPair pair)
         {
-            int xBlock = x / BlockLineCount;
-            int yBlock = y / BlockLineCount;
+            int xBlock = pair.X / BlockLineCount;
+            int yBlock = pair.Y / BlockLineCount;
 
             int blockColumn = xBlock * BlockLineCount;
             int blockRow = yBlock * BlockLineCount;
@@ -166,42 +173,42 @@ namespace Common
                 }
         }
 
-        public IEnumerable<IndexPair> GetRowPairs(int y)
+        public IEnumerable<IndexPair> GetRowPairs(IndexPair pair)
         {
             for (int i = 0; i < CellLineCount; i++)
             {
-                yield return new IndexPair(i, y);
+                yield return new IndexPair(i, pair.Y);
             }
         }
 
-        public IEnumerable<IndexPair> GetColumnPairs(int x)
+        public IEnumerable<IndexPair> GetColumnPairs(IndexPair pair)
         {
             for (int j = CellLineCount - 1; j >= 0; j--)
             {
-                yield return new IndexPair(x, j);
+                yield return new IndexPair(pair.X, j);
             }
         }
-        
+
         public IEnumerable<IndexPair> GetBlockOrderedPairs()
         {
             var result = new List<IndexPair>();
 
             for (int j = CellLineCount - 1; j >= 0; j -= BlockLineCount)
                 for (int i = 0; i < CellLineCount; i += BlockLineCount)
-            {
-                result.AddRange(GetBlockPairs(i, j));
-            }
+                {
+                    result.AddRange(GetBlockPairs(new IndexPair(i, j)));
+                }
 
             return result;
         }
-        
+
         public IEnumerable<IndexPair> GetAllPairs()
         {
             for (int i = 0; i < CellLineCount; i++)
                 for (int j = 0; j < CellLineCount; j++)
-            {
-                yield return new IndexPair(i, j);
-            }
+                {
+                    yield return new IndexPair(i, j);
+                }
         }
     }
 }

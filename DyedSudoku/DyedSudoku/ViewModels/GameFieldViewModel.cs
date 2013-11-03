@@ -79,20 +79,19 @@ namespace DyedSudoku
 
         private void DrawCellsBackground()
         {
-            for (int i = 0; i < Model.CellLineCount; i++)
-                for (int j = 0; j < Model.CellLineCount; j++)
-                {
-                    if (Model.IsItemEmpty(i, j))
-                        continue;
+            foreach (var pair in Model.GetAllPairs())
+            {
+                if (Model.IsItemEmpty(pair))
+                    continue;
 
-                    if (Model.GetItemVisible(i, j))
-                        context.SetFillVisibleItemColor();
-                    else
-                        context.SetFillInitializedItemColor();
+                if (Model.GetItemVisible(pair))
+                    context.SetFillVisibleItemColor();
+                else
+                    context.SetFillInitializedItemColor();
 
-                    context.AddRect(new RectangleF(i * cellWidth, j * cellHeight, cellWidth, cellHeight));
-                    context.DrawPath(CGPathDrawingMode.Fill);
-                }
+                context.AddRect(new RectangleF(pair.X * cellWidth, pair.Y * cellHeight, cellWidth, cellHeight));
+                context.DrawPath(CGPathDrawingMode.Fill);
+            }
         }
 
         private void DrawLines()
@@ -130,14 +129,13 @@ namespace DyedSudoku
         {
             context.SetDefaultTextSettings();
 
-            for (int i = 0; i < Model.CellLineCount; i++)
-                for (int j = 0; j < Model.CellLineCount; j++)
-                {
-                    if (!Model.GetItemVisible(i, j))
-                        continue;
+            foreach (var pair in Model.GetAllPairs())
+            {
+                if (!Model.GetItemVisible(pair))
+                    continue;
 
-                    context.DrawText(Model.GetItemNumber(i, j).ToString(), i * cellWidth + cellContentLeft, j * cellHeight + cellContentBottom);
-                }
+                context.DrawText(Model.GetItemNumber(pair).ToString(), pair.X * cellWidth + cellContentLeft, pair.Y * cellHeight + cellContentBottom);
+            }
         }
 
         private void DrawFPS()

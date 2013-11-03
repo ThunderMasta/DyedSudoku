@@ -47,44 +47,44 @@ namespace Common
         {
             foreach (var pair in model.GetBlockOrderedPairs())
             {
-                if (!GenerateNumber(model, rand, pair.X, pair.Y))
+                if (!GenerateNumber(model, rand, pair))
                     return false;
             }
 
             return true;
         }
 
-        private static bool GenerateNumber(GameFieldModel model, Random rand, int x, int y)
+        private static bool GenerateNumber(GameFieldModel model, Random rand, IndexPair pair)
         {
-            var availableNumbers = GetHeuristicsAvailableNumbers(model, x, y);
+            var availableNumbers = GetHeuristicsAvailableNumbers(model, pair);
             sbyte number = rand.Choose(availableNumbers);
 
-            model.SetItemNumber(number, x, y);
+            model.SetItemNumber(pair, number);
 
-            return !model.IsItemEmpty(x, y);
+            return !model.IsItemEmpty(pair);
         }
 
-        private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, int x, int y)
+        private static IEnumerable<sbyte> GetHeuristicsAvailableNumbers(GameFieldModel model, IndexPair pair)
         {
-            var blockDict = GetBlockAvailableDict(model, x, y);
-            var available = GetAvailableByDict(blockDict, x, y);
+            var blockDict = GetBlockAvailableDict(model, pair);
+            var available = GetAvailableByDict(blockDict, pair);
 
-            var rowDict = GetRowAvailableDict(model, y);
-            available = available.Intersect(GetAvailableByDict(rowDict, x, y));
+            var rowDict = GetRowAvailableDict(model, pair);
+            available = available.Intersect(GetAvailableByDict(rowDict, pair));
 
-            var columnDict = GetColumnAvailableDict(model, x);
-            available = available.Intersect(GetAvailableByDict(columnDict, x, y));
+            var columnDict = GetColumnAvailableDict(model, pair);
+            available = available.Intersect(GetAvailableByDict(columnDict, pair));
 
             return available;
         }
 
-        private static IEnumerable<sbyte> GetAvailableByDict(Dictionary<IndexPair, IEnumerable<sbyte>> dict, int x, int y)
+        private static IEnumerable<sbyte> GetAvailableByDict(Dictionary<IndexPair, IEnumerable<sbyte>> dict, IndexPair pair)
         {
             while (SetNumbersIfSingle(dict) || RemoveSingleNumbers(dict))
             {
             }
 
-            return dict.First(item => item.Key.X == x && item.Key.Y == y).Value;
+            return dict.First(item => item.Key.Equals(pair)).Value;
         }
 
         private static bool SetNumbersIfSingle(Dictionary<IndexPair, IEnumerable<sbyte>> dict)
@@ -127,21 +127,21 @@ namespace Common
             return isModified;
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, int x, int y)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetBlockAvailableDict(GameFieldModel model, IndexPair pair)
         {
-            var blockPairs = model.GetBlockPairs(x, y);
+            var blockPairs = model.GetBlockPairs(pair);
             return GetAvailableDictByPairs(model, blockPairs);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, int y)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetRowAvailableDict(GameFieldModel model, IndexPair pair)
         {
-            var rowPairs = model.GetRowPairs(y);
+            var rowPairs = model.GetRowPairs(pair);
             return GetAvailableDictByPairs(model, rowPairs);
         }
 
-        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, int x)
+        private static Dictionary<IndexPair, IEnumerable<sbyte>> GetColumnAvailableDict(GameFieldModel model, IndexPair pair)
         {
-            var columnPairs = model.GetColumnPairs(x);
+            var columnPairs = model.GetColumnPairs(pair);
             return GetAvailableDictByPairs(model, columnPairs);
         }
 
@@ -151,7 +151,7 @@ namespace Common
 
             foreach (var pair in pairs)
             {
-                dict.Add(pair, model.GetAvailableNumbers(pair.X, pair.Y));
+                dict.Add(pair, model.GetAvailableNumbers(pair));
             }
 
             return dict;
@@ -175,7 +175,7 @@ namespace Common
                 if (pair == null)
                     break;
 
-                model.SetItemVisible(false, pair.X, pair.Y);
+                model.SetItemVisible(pair, false);
 
                 pairs.Remove(pair);
             }
@@ -188,12 +188,12 @@ namespace Common
         {
             foreach (var pair in pairs)
             {
-                model.SetItemVisible(false, pair.X, pair.Y);
+                model.SetItemVisible(pair, false);
 
-                if (GetHeuristicsAvailableNumbers(model, pair.X, pair.Y).Count() <= 1)
+                if (GetHeuristicsAvailableNumbers(model, pair).Count() <= 1)
                     yield return pair;
 
-                model.SetItemVisible(true, pair.X, pair.Y);
+                model.SetItemVisible(pair, true);
             }
         }
     }
