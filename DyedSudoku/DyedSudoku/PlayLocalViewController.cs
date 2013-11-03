@@ -11,6 +11,8 @@ namespace DyedSudoku
         // Need update thread for custom animation
         private volatile bool needUpdateGameField;
 
+        private GameFieldViewModel gameFieldViewModel;
+
         public PlayLocalViewController() : base ("PlayLocalViewController", null)
         {
             InitGameFieldView();
@@ -24,7 +26,8 @@ namespace DyedSudoku
             var frame = new RectangleF(5, gameFieldView.Frame.Y, width, width);
 
             gameFieldView.Frame = frame;
-            gameFieldView.SetDataSource(new GameFieldViewModel(frame));
+            gameFieldViewModel = new GameFieldViewModel(frame);
+            gameFieldView.SetDataSource(gameFieldViewModel);
         }
 
         private void StartUpdateThread()
@@ -58,6 +61,9 @@ namespace DyedSudoku
         partial void done(MonoTouch.Foundation.NSObject sender)
         {
             StopUpdateThread();
+
+            if (gameFieldViewModel != null)
+                gameFieldViewModel.Cancel();
 
             if (Done != null)
                 Done(this, EventArgs.Empty);

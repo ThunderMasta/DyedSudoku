@@ -32,6 +32,11 @@ namespace DyedSudoku
             Model = new GameFieldModel();
         }
 
+        public void Cancel()
+        {
+            Model.Cancel();
+        }
+
         public void InitCellSizes(RectangleF frame)
         {
             Frame = frame;

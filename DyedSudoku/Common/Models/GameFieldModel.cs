@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Common
 {
@@ -11,6 +12,7 @@ namespace Common
         // Zero is left bottom couse CTM is inversed
         private CellItem[,] field;
         private static readonly List<sbyte> numberList = new List<sbyte> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        private CancellationTokenSource cancellationTokenSource;
 
         public sbyte CellLineCount
         {
@@ -34,6 +36,12 @@ namespace Common
             InitField();
         }
 
+        public void Cancel()
+        {
+            if (IsInitializing)
+                cancellationTokenSource.Cancel();
+        }
+
         private void InitField()
         {
             field = new CellItem[CellLineCount, CellLineCount];
@@ -41,7 +49,9 @@ namespace Common
             foreach (var pair in GetAllPairs())
                 field[pair.X, pair.Y] = new CellItem();
 
-            GameFieldFillHelper.Init(this);
+            cancellationTokenSource = new CancellationTokenSource();
+
+            GameFieldFillHelper.Init(this, cancellationTokenSource.Token);
         }
 
         public sbyte GetItemNumber(IndexPair pair)

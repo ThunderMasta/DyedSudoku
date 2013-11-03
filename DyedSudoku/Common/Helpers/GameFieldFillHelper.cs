@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Common
 {
@@ -10,43 +11,44 @@ namespace Common
         private const int maxVisibleNumbers = 30;
         private const int maxTryVisibleCount = 3;
 
-        public static void Init(GameFieldModel model)
+        public static void Init(GameFieldModel model, CancellationToken token)
         {
-            new Thread(() =>
-            {
-                InitModel(model);
-            }).Start();
+            Task.Factory.StartNew(() => InitModel(model, token), token);
         }
 
-        private static void InitModel(GameFieldModel model)
+        private static void InitModel(GameFieldModel model, CancellationToken token)
         {
             model.BeginInitializing();
 
             var rand = new Random();
 
-            while (!InitNumbers(model, rand))
+            while (!InitNumbers(model, rand, token))
             {
             }
 
-            for (int k = 0; k < maxTryVisibleCount && !InitVisible(model, rand); k++)
+            token.ThrowIfCancellationRequested();
+
+            for (int k = 0; k < maxTryVisibleCount && !InitVisible(model, rand, token); k++)
             {
             }
 
             model.EndInitializing();
         }
 
-        private static bool InitNumbers(GameFieldModel model, Random rand)
+        private static bool InitNumbers(GameFieldModel model, Random rand, CancellationToken token)
         {
             model.ClearNumbers();
             model.ClearVisible();
 
-            return SetNumbers(model, rand);
+            return SetNumbers(model, rand, token);
         }
 
-        private static bool SetNumbers(GameFieldModel model, Random rand)
+        private static bool SetNumbers(GameFieldModel model, Random rand, CancellationToken token)
         {
             foreach (var pair in model.GetBlockOrderedPairs())
             {
+                token.ThrowIfCancellationRequested();
+
                 if (!GenerateNumber(model, rand, pair))
                     return false;
             }
@@ -157,19 +159,19 @@ namespace Common
             return dict;
         }
 
-        private static bool InitVisible(GameFieldModel model, Random rand)
+        private static bool InitVisible(GameFieldModel model, Random rand, CancellationToken token)
         {
             model.ClearVisible();
 
-            return HideItems(model, rand);
+            return HideItems(model, rand, token);
         }
 
-        private static bool HideItems(GameFieldModel model, Random rand)
+        private static bool HideItems(GameFieldModel model, Random rand, CancellationToken token)
         {
             var pairs = model.GetAllPairs().ToList();
             do
             {
-                var hidePairs = GetAvailableToHideIndexPairs(model, pairs);
+                var hidePairs = GetAvailableToHideIndexPairs(model, pairs, token);
                 var pair = rand.Choose(hidePairs);
 
                 if (pair == null)
@@ -184,12 +186,18 @@ namespace Common
             return pairs.Count <= maxVisibleNumbers;
         }
 
-        private static IEnumerable<IndexPair> GetAvailableToHideIndexPairs(GameFieldModel model, IEnumerable<IndexPair> pairs)
+        private static IEnumerable<IndexPair> GetAvailableToHideIndexPairs(GameFieldModel model, IEnumerable<IndexPair> pairs, CancellationToken token)
         {
             foreach (var pair in pairs)
-            {                             
+            {
+                token.ThrowIfCancellationRequested();
+
+                model.SetItemVisible(pair, false);
+
                 if (GetHeuristicsAvailableNumbers(model, pair).Count() <= 1)
                     yield return pair;
+
+                model.SetItemVisible(pair, true);
             }
         }
     }
