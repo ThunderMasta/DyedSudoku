@@ -81,7 +81,11 @@ namespace DyedSudoku
 
         partial void singleTap(NSObject sender)
         {
-            gameFieldViewModel.Cancel();
+            var tapRecognizer = (UITapGestureRecognizer) sender;
+
+            var point = tapRecognizer.LocationInView(gameFieldView);
+
+            gameFieldViewModel.UpdateByTap(point);
         }
     }
 }

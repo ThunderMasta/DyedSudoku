@@ -7,11 +7,23 @@ namespace DyedSudoku
 {
     public class GameFieldViewModel
     {
+        private enum EMode
+        {
+            Normal,
+            Dialog,
+            Win,
+            Lose
+        }
+
         private FPSCounter fpsCounter = new FPSCounter();
 
         public RectangleF Frame { get; private set; }
 
+        private IndexPair SelectedPair { get; set; }
+
         private GameFieldModel Model { get; set; }
+
+        private EMode Mode { get; set; }
 
         private float cellHeight;
         private float cellWidth;
@@ -30,6 +42,7 @@ namespace DyedSudoku
         public void InitModel()
         {
             Model = new GameFieldModel();
+            Mode = EMode.Normal;
         }
 
         public void Cancel()
@@ -60,10 +73,12 @@ namespace DyedSudoku
             }
             else
             {
+                DrawSelected();
                 DrawModel();
             }
 
             DrawLines();
+            DrawDialogs();
             DrawFPS();
         }
 
@@ -94,9 +109,14 @@ namespace DyedSudoku
                 else
                     context.SetFillInitializedItemColor();
 
-                context.AddRect(new RectangleF(pair.X * cellWidth, pair.Y * cellHeight, cellWidth, cellHeight));
-                context.DrawPath(CGPathDrawingMode.Fill);
+                FillCellBackground(pair);
             }
+        }
+
+        private void FillCellBackground(IndexPair pair)
+        {
+            context.AddRect(new RectangleF(pair.X * cellWidth, pair.Y * cellHeight, cellWidth, cellHeight));
+            context.DrawPath(CGPathDrawingMode.Fill);
         }
 
         private void DrawLines()
@@ -149,6 +169,71 @@ namespace DyedSudoku
 
             context.DrawInfoText(DateTime.Now.ToLongTimeString(), Frame.Width - 100, Frame.Height - 20);
             context.DrawInfoText(fpsCounter.GetFPS().ToString(), Frame.Width - 30, Frame.Height - 20);
+        }
+
+        private void DrawSelected()
+        {
+            if (SelectedPair == null)
+                return;
+
+            context.SetFillSelectedItemColor();
+            FillCellBackground(SelectedPair);
+        }
+
+        public void UpdateByTap(PointF point)
+        {
+            if (Model.IsInitializing || Mode != EMode.Normal)
+                return;
+
+            var x = (int)(point.X / cellWidth);
+            var y = (int)((Frame.Height - point.Y) / cellHeight);
+            SelectedPair = new IndexPair(x, y);
+
+            Mode = EMode.Dialog;
+        }
+
+        public void DrawDialogs()
+        {
+            switch (Mode)
+            {
+                case EMode.Normal:
+                    break;
+                case EMode.Dialog:
+                    DrawDialog();
+                    break;
+                case EMode.Win:
+                case EMode.Lose:
+                    DrawResultInfo();
+                    break;
+                default:
+                    throw new ArgumentException("Mode");
+            }
+        }
+
+        public void DrawDialog()
+        {
+            Mode = EMode.Win;
+        }
+
+        public void DrawResultInfo()
+        {
+            var centerHeight = Frame.Height / 2;
+            var centerWigth = Frame.Width / 2;
+
+            context.SetFillDialogBorderColor();
+            context.AddRect(new RectangleF(centerWigth - 125, centerHeight - 75, 250, 150));
+            context.DrawPath(CGPathDrawingMode.Fill);
+
+            if (Mode == EMode.Win)
+                context.SetFillWinInfoBackgroundColor();
+            else
+                context.SetFillLoseInfoBackgroundColor();
+
+            context.AddRect(new RectangleF(centerWigth - 115, centerHeight - 65, 230, 130));
+            context.DrawPath(CGPathDrawingMode.Fill);
+
+            context.SetDefaultTextSettings();
+            context.DrawResultText(Mode == EMode.Win ? "Win" : "Lose", Frame.Width / 2, Frame.Height / 2 - 30, true);
         }
     }
 }

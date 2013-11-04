@@ -39,15 +39,20 @@ namespace Common
 
         public static void DrawText(this CGContext context, string source, float x, float y)
         {
-            context.DrawText(source, x, y, "Helvetica", 26f);
+            context.DrawText(source, x, y, "Helvetica", 26f, false);
         }
 
         public static void DrawInfoText(this CGContext context, string source, float x, float y)
         {
-            context.DrawText(source, x, y, "Helvetica", 12f);
+            context.DrawText(source, x, y, "Helvetica", 12f, false);
         }
 
-        private static void DrawText(this CGContext context, string source, float x, float y, string fontName, float fontSize)
+        public static void DrawResultText(this CGContext context, string source, float x, float y, bool isCenter)
+        {
+            context.DrawText(source, x, y, "Helvetica", 100f, isCenter);
+        }
+
+        private static void DrawText(this CGContext context, string source, float x, float y, string fontName, float fontSize, bool isCenter)
         {
             var stringAttributes = new CTStringAttributes
             {
@@ -61,6 +66,9 @@ namespace Common
 
             using (var textLine = new CTLine(attributedString))
             {
+                if (isCenter)
+                    context.TextPosition = new PointF((float)(x - (textLine.GetTypographicBounds() / 2)), y);
+
                 textLine.Draw(context);
             }
         }
@@ -78,6 +86,31 @@ namespace Common
         public static void SetFillVisibleItemColor(this CGContext context)
         {
             context.SetFillColor(UIColor.Green.CGColor);
+        }
+
+        public static void SetFillSelectedItemColor(this CGContext context)
+        {
+            context.SetFillColor(UIColor.Orange.CGColor);
+        }
+
+        public static void SetFillDialogBorderColor(this CGContext context)
+        {
+            context.SetFillColor(UIColor.Blue.CGColor);
+        }
+
+        public static void SetFillDialogBackgroungColor(this CGContext context)
+        {
+            context.SetFillColor(UIColor.White.CGColor);
+        }
+
+        public static void SetFillWinInfoBackgroundColor(this CGContext context)
+        {
+            context.SetFillColor(UIColor.Green.CGColor);
+        }
+
+        public static void SetFillLoseInfoBackgroundColor(this CGContext context)
+        {
+            context.SetFillColor(UIColor.Red.CGColor);
         }
     }
 }
