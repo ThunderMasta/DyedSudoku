@@ -78,6 +78,11 @@ namespace DyedSudoku
                 BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
             }
         }
+
+        partial void singleTap(NSObject sender)
+        {
+            gameFieldViewModel.Cancel();
+        }
     }
 }
 
