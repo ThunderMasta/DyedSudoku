@@ -23,6 +23,8 @@ namespace DyedSudoku
 
         private GameFieldModel Model { get; set; }
 
+        private DialogViewModel DialogViewModel { get; set; }
+
         private EMode Mode { get; set; }
 
         private float cellHeight;
@@ -32,6 +34,11 @@ namespace DyedSudoku
         private CGContext context;
         private const float cellContentLeft = 10;
         private const float cellContentBottom = 8;
+        private const float dialogResultWidth = 250;
+        private const float dialogResultHeight = 150;
+        private const float dialogBorder = 10;
+        private const float dialogContentBottom = 30;
+        private const float dialogOffset = 1;
 
         public GameFieldViewModel(RectangleF frame)
         {
@@ -79,7 +86,7 @@ namespace DyedSudoku
 
             DrawLines();
             DrawDialogs();
-            DrawFPS();
+            //jDrawFPS();
         }
 
         private void SetCurrentContext(CGContext ctx)
@@ -182,14 +189,84 @@ namespace DyedSudoku
 
         public void UpdateByTap(PointF point)
         {
-            if (Model.IsInitializing || Mode != EMode.Normal)
+            if (Model.IsInitializing)
                 return;
 
-            var x = (int)(point.X / cellWidth);
-            var y = (int)((Frame.Height - point.Y) / cellHeight);
-            SelectedPair = new IndexPair(x, y);
+            var ctmPoint = new PointF(point.X, Frame.Height - point.Y);
 
-            Mode = EMode.Dialog;
+            if (Mode == EMode.Normal)
+            {
+                var x = (int)(ctmPoint.X / cellWidth);
+                var y = (int)(ctmPoint.Y / cellHeight);
+                var pair = new IndexPair(x, y);
+
+                if (Model.GetItemVisible(pair))
+                    return;
+
+                SelectedPair = pair;
+
+                DialogViewModel = new DialogViewModel(GetDialogFrame(ctmPoint), dialogBorder);
+
+                Mode = EMode.Dialog;
+
+                return;
+            }
+
+            if (Mode == EMode.Dialog)
+            {
+                if (DialogViewModel == null)
+                    return;
+
+                if (DialogViewModel.IsInside(ctmPoint))
+                {
+                    Model.SetItemVisible(SelectedPair, true);
+
+                    if (DialogViewModel.GetNumber(ctmPoint) != Model.GetItemNumber(SelectedPair))
+                    {
+                        Mode = EMode.Lose;
+                    }
+                    else if (Model.IsAllItemsVisible)
+                    {
+                        Mode = EMode.Win;
+                    }
+                    else
+                    {
+                        Mode = EMode.Normal;
+                    }
+                }
+                else
+                {
+                    Mode = EMode.Normal;
+                }
+
+                SelectedPair = null;
+                DialogViewModel = null;
+
+                return;
+            }
+        }
+
+        private RectangleF GetDialogFrame(PointF point)
+        {
+            var dialogWidth = 4 * cellWidth;
+            var dialogHeight = 4 * cellHeight;
+
+            var left = point.X - dialogWidth / 2;
+            var bottom = point.Y - dialogHeight / 2;
+
+            if (left < dialogOffset)
+                left = dialogOffset;
+
+            if (bottom < dialogOffset)
+                bottom = dialogOffset;
+
+            if (left + dialogWidth > Frame.Width - dialogOffset)
+                left = Frame.Width - dialogWidth - dialogOffset;
+
+            if (bottom + dialogHeight > Frame.Height - dialogOffset)
+                bottom = Frame.Height - dialogHeight - dialogOffset;
+
+            return new RectangleF(left, bottom, dialogWidth, dialogHeight);
         }
 
         public void DrawDialogs()
@@ -212,16 +289,27 @@ namespace DyedSudoku
 
         public void DrawDialog()
         {
-            Mode = EMode.Win;
+            if (DialogViewModel == null)
+                return;
+
+            DialogViewModel.Draw(context);
         }
 
         public void DrawResultInfo()
         {
             var centerHeight = Frame.Height / 2;
             var centerWigth = Frame.Width / 2;
+            var left = centerWigth - dialogResultWidth / 2;
+            var bottom = centerHeight - dialogResultHeight / 2;
 
             context.SetFillDialogBorderColor();
-            context.AddRect(new RectangleF(centerWigth - 125, centerHeight - 75, 250, 150));
+
+            context.AddRect(
+                new RectangleF(left, 
+                               bottom, 
+                               dialogResultWidth, 
+                               dialogResultHeight));
+
             context.DrawPath(CGPathDrawingMode.Fill);
 
             if (Mode == EMode.Win)
@@ -229,11 +317,16 @@ namespace DyedSudoku
             else
                 context.SetFillLoseInfoBackgroundColor();
 
-            context.AddRect(new RectangleF(centerWigth - 115, centerHeight - 65, 230, 130));
+            context.AddRect(
+                new RectangleF(left + dialogBorder, 
+                               bottom + dialogBorder, 
+                               dialogResultWidth - 2 * dialogBorder, 
+                               dialogResultHeight - 2 * dialogBorder));
+
             context.DrawPath(CGPathDrawingMode.Fill);
 
             context.SetDefaultTextSettings();
-            context.DrawResultText(Mode == EMode.Win ? "Win" : "Lose", Frame.Width / 2, Frame.Height / 2 - 30, true);
+            context.DrawResultText(Mode == EMode.Win ? "Win" : "Lose", centerWigth, centerHeight - dialogContentBottom, true);
         }
     }
 }

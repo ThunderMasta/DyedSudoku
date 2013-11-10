@@ -31,6 +31,11 @@ namespace Common
             get{ return isInitializing; }
         }
 
+        public bool IsAllItemsVisible
+        {
+            get { return GetAllPairs().All(GetItemVisible); }
+        }
+
         public GameFieldModel()
         {
             InitField();

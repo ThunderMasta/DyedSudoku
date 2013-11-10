@@ -112,6 +112,7 @@
     </Compile>
     <Compile Include="Views\GameFieldView.cs" />
     <Compile Include="ViewModels\GameFieldViewModel.cs" />
+    <Compile Include="ViewModels\DialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainViewController.xib" />

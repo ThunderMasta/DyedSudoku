@@ -52,6 +52,11 @@ namespace Common
             context.DrawText(source, x, y, "Helvetica", 100f, isCenter);
         }
 
+        public static void DrawDialogText(this CGContext context, string source, float x, float y, bool isCenter)
+        {
+            context.DrawText(source, x, y, "Helvetica", 36f, isCenter);
+        }
+
         private static void DrawText(this CGContext context, string source, float x, float y, string fontName, float fontSize, bool isCenter)
         {
             var stringAttributes = new CTStringAttributes
