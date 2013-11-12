@@ -39,22 +39,22 @@ namespace Common
 
         public static void DrawText(this CGContext context, string source, float x, float y)
         {
-            context.DrawText(source, x, y, "Helvetica", 26f, false);
+            context.DrawText(source, x, y, "HelveticaNeue-UltraLight", 26f, false);
         }
 
         public static void DrawInfoText(this CGContext context, string source, float x, float y)
         {
-            context.DrawText(source, x, y, "Helvetica", 12f, false);
+            context.DrawText(source, x, y, "HelveticaNeue-UltraLight", 12f, false);
         }
 
         public static void DrawResultText(this CGContext context, string source, float x, float y, bool isCenter)
         {
-            context.DrawText(source, x, y, "Helvetica", 100f, isCenter);
+            context.DrawText(source, x, y, "HelveticaNeue-UltraLight", 100f, isCenter);
         }
 
         public static void DrawDialogText(this CGContext context, string source, float x, float y, bool isCenter)
         {
-            context.DrawText(source, x, y, "Helvetica", 36f, isCenter);
+            context.DrawText(source, x, y, "HelveticaNeue-UltraLight", 36f, isCenter);
         }
 
         private static void DrawText(this CGContext context, string source, float x, float y, string fontName, float fontSize, bool isCenter)

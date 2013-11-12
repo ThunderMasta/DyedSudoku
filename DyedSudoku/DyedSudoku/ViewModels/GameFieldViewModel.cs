@@ -36,7 +36,7 @@ namespace DyedSudoku
         private const float cellContentBottom = 8;
         private const float dialogResultWidth = 250;
         private const float dialogResultHeight = 150;
-        private const float dialogBorder = 10;
+        private const float dialogBorder = 3;
         private const float dialogContentBottom = 30;
         private const float dialogOffset = 1;
 
@@ -86,7 +86,7 @@ namespace DyedSudoku
 
             DrawLines();
             DrawDialogs();
-            //jDrawFPS();
+            //DrawFPS();
         }
 
         private void SetCurrentContext(CGContext ctx)
