@@ -197,9 +197,9 @@ namespace Common
             return pairs.Count <= maxVisibleNumbers;
         }
 
-        private static IndexPair GetAvailableToHidePair(GameFieldModel model, IEnumerable<IndexPair> pairs, CancellationToken token)
+        private static IndexPair GetAvailableToHidePair(GameFieldModel model, List<IndexPair> pairs, CancellationToken token)
         {
-            foreach (var pair in pairs)
+            foreach (var pair in pairs.ToList())
             {
                 token.ThrowIfCancellationRequested();
 
@@ -209,6 +209,8 @@ namespace Common
                     return pair;
 
                 model.SetItemVisible(pair, true);
+
+                pairs.Remove(pair);
             }
 
             return null;
