@@ -10,5 +10,9 @@
 	</array>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon</string>
+	</array>
 </dict>
 </plist>

@@ -168,11 +168,22 @@ namespace Common
 
         private static bool HideItems(GameFieldModel model, Random rand, CancellationToken token)
         {
-            var pairs = model.GetAllPairs().ToList();
+            var orderedPairs = model.GetAllPairs().ToList();
+            var pairs = new List<IndexPair>();
+
             do
             {
-                var hidePairs = GetAvailableToHideIndexPairs(model, pairs, token);
-                var pair = rand.Choose(hidePairs);
+                var pair = rand.Choose(orderedPairs);
+
+                orderedPairs.Remove(pair);
+
+                pairs.Add(pair);
+            }
+            while(orderedPairs.Any());
+
+            do
+            {
+                var pair = GetAvailableToHidePair(model, pairs, token);
 
                 if (pair == null)
                     break;
@@ -186,7 +197,7 @@ namespace Common
             return pairs.Count <= maxVisibleNumbers;
         }
 
-        private static IEnumerable<IndexPair> GetAvailableToHideIndexPairs(GameFieldModel model, IEnumerable<IndexPair> pairs, CancellationToken token)
+        private static IndexPair GetAvailableToHidePair(GameFieldModel model, IEnumerable<IndexPair> pairs, CancellationToken token)
         {
             foreach (var pair in pairs)
             {
@@ -195,10 +206,12 @@ namespace Common
                 model.SetItemVisible(pair, false);
 
                 if (GetHeuristicsAvailableNumbers(model, pair).Count() <= 1)
-                    yield return pair;
+                    return pair;
 
                 model.SetItemVisible(pair, true);
             }
+
+            return null;
         }
     }
 }
