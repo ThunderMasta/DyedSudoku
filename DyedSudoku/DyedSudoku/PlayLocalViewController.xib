@@ -40,6 +40,9 @@
                 </view>
             </subviews>
             <color key="backgroundColor" red="1" green="0.80000000000000004" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="bMN-ZR-Ias" appends="YES" id="5OO-kt-9hr"/>
+            </connections>
         </view>
         <tapGestureRecognizer id="bMN-ZR-Ias">
             <connections>

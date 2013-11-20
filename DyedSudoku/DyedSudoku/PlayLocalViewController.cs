@@ -10,7 +10,6 @@ namespace DyedSudoku
     {
         // Need update thread for custom animation
         private volatile bool needUpdateGameField;
-
         private GameFieldViewModel gameFieldViewModel;
 
         public PlayLocalViewController() : base ("PlayLocalViewController", null)
@@ -74,18 +73,21 @@ namespace DyedSudoku
             while (needUpdateGameField)
             {
                 //Sleep for 60 fps
-                Thread.Sleep(15);
+                Thread.Sleep(100);
                 BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
             }
         }
 
         partial void singleTap(NSObject sender)
         {
-            var tapRecognizer = (UITapGestureRecognizer) sender;
+            var tapRecognizer = (UITapGestureRecognizer)sender;
 
             var point = tapRecognizer.LocationInView(gameFieldView);
 
-            gameFieldViewModel.UpdateByTap(point);
+            if (gameFieldView.Frame.Contains(point))
+                gameFieldViewModel.UpdateByTap(point);
+            else
+                gameFieldViewModel.UpdateByOffboardTap();
         }
     }
 }

@@ -246,6 +246,16 @@ namespace DyedSudoku
             }
         }
 
+        public void UpdateByOffboardTap()
+        {
+            if (Mode != EMode.Dialog)
+                return;
+
+            Mode = EMode.Normal;
+            SelectedPair = null;
+            DialogViewModel = null;
+        }
+
         private RectangleF GetDialogFrame(PointF point)
         {
             var dialogWidth = 4 * cellWidth;
