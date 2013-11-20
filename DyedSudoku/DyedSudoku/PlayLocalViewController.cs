@@ -82,10 +82,11 @@ namespace DyedSudoku
         {
             var tapRecognizer = (UITapGestureRecognizer)sender;
 
-            var point = tapRecognizer.LocationInView(gameFieldView);
+            var point = tapRecognizer.LocationInView(View);
+            var gameFieldPoint = tapRecognizer.LocationInView(gameFieldView);
 
             if (gameFieldView.Frame.Contains(point))
-                gameFieldViewModel.UpdateByTap(point);
+                gameFieldViewModel.UpdateByTap(gameFieldPoint);
             else
                 gameFieldViewModel.UpdateByOffboardTap();
         }
