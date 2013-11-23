@@ -10,7 +10,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DyedSudoku</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +25,7 @@
     <MtouchI18n>
     </MtouchI18n>
     <MtouchArch>ARMv7</MtouchArch>
+    <AssemblyName>DyedSudoku</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>full</DebugType>
@@ -35,6 +35,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchLink>None</MtouchLink>
+    <AssemblyName>DyedSudoku</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +52,7 @@
     </MtouchI18n>
     <MtouchArch>ARMv7</MtouchArch>
     <AssemblyOriginatorKeyFile>..\..\..\..\Downloads\ios_development.cer</AssemblyOriginatorKeyFile>
+    <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <Optimize>true</Optimize>
@@ -68,6 +70,7 @@
     <MtouchArch>ARMv7, ARMv7s</MtouchArch>
     <MtouchLink>Full</MtouchLink>
     <MtouchUseSGen>true</MtouchUseSGen>
+    <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>full</DebugType>
@@ -81,6 +84,7 @@
     <CodesignProvision>Automatic:AdHoc</CodesignProvision>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Downloads\ios_development.cer</AssemblyOriginatorKeyFile>
+    <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>full</DebugType>
@@ -93,6 +97,7 @@
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Downloads\ios_development.cer</AssemblyOriginatorKeyFile>
+    <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -73,7 +73,7 @@ namespace DyedSudoku
             while (needUpdateGameField)
             {
                 //Sleep for 60 fps
-                Thread.Sleep(100);
+                Thread.Sleep(15);
                 BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
             }
         }

@@ -36,6 +36,11 @@ namespace Common
             get { return GetAllPairs().All(GetItemVisible); }
         }
 
+        public int VisibleCount
+        {
+            get { return GetAllPairs().Count(GetItemVisible); }
+        }
+
         public GameFieldModel()
         {
             InitField();

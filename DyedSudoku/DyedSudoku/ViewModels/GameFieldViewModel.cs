@@ -86,7 +86,7 @@ namespace DyedSudoku
 
             DrawLines();
             DrawDialogs();
-            //DrawFPS();
+			//DrawFPS();
         }
 
         private void SetCurrentContext(CGContext ctx)
