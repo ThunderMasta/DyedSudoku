@@ -13,6 +13,7 @@ namespace Common
         private CellItem[,] field;
         private static readonly List<sbyte> numberList = new List<sbyte> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         private CancellationTokenSource cancellationTokenSource;
+		private IndexPair[,] indexPairs;
 
         public sbyte CellLineCount
         {
@@ -23,6 +24,8 @@ namespace Common
         {
             get { return blockLineCount; }
         }
+
+		public IndexPair SelectedPair { get; set;}
 
         private bool isInitializing;
 
@@ -55,6 +58,13 @@ namespace Common
         private void InitField()
         {
             field = new CellItem[CellLineCount, CellLineCount];
+			indexPairs = new IndexPair[CellLineCount, CellLineCount];
+
+			for (int i = 0; i < CellLineCount; i++)
+				for (int j = 0; j < CellLineCount; j++)
+				{
+					indexPairs[i, j] = new IndexPair(i, j);
+				}
 
             foreach (var pair in GetAllPairs())
                 field[pair.X, pair.Y] = new CellItem();
@@ -121,6 +131,12 @@ namespace Common
             isInitializing = false;
         }
 
+		public bool IsSelectedPair(IndexPair pair)
+		{
+			var selectedPair = SelectedPair;
+			return isInitializing && selectedPair != null && selectedPair.X == pair.X && selectedPair.Y == pair.Y;
+		}
+
         public IEnumerable<sbyte> GetAvailableNumbers(IndexPair pair, IndexPair checkedPair)
         {
             return IsItemNotAvailable(pair, checkedPair)
@@ -128,7 +144,7 @@ namespace Common
                     : GetDefaultAvailableNumbers(pair);
         }
 
-        private bool IsItemNotAvailable(IndexPair pair, IndexPair checkedPair)
+		public bool IsItemNotAvailable(IndexPair pair, IndexPair checkedPair)
         {
             return IsItemEmpty(pair) || !GetItemVisible(pair) || checkedPair.X == pair.X && checkedPair.Y == pair.Y;
         }
@@ -139,12 +155,18 @@ namespace Common
         }
 
         private IEnumerable<sbyte> GetCheckedAvailableNumbers(IndexPair pair, IndexPair checkedPair)
-        {
+		{
+			var cellBlockNumbers = GetBlockNumbers(pair, checkedPair);
             var cellRowNumbers = GetRowNumbers(pair, checkedPair);
-            var cellColumnNumbers = GetColumnNumbers(pair, checkedPair);
-            var cellBlockNumbers = GetBlockNumbers(pair, checkedPair);
 
-            var alreadyGeneratedNumbers = cellRowNumbers.Union(cellColumnNumbers).Union(cellBlockNumbers).Distinct();
+			var blockRowNumbers = cellBlockNumbers.Union(cellRowNumbers).Distinct().ToList();
+
+			if (blockRowNumbers.Count == CellLineCount)
+				return new List<sbyte>();
+
+			var cellColumnNumbers = GetColumnNumbers(pair, checkedPair);
+
+			var alreadyGeneratedNumbers = blockRowNumbers.Union(cellColumnNumbers).Distinct();
 
             return numberList.Except(alreadyGeneratedNumbers);
         }
@@ -189,7 +211,7 @@ namespace Common
                     var xCell = blockColumn + i;
                     var yCell = blockRow + j;
 
-                    yield return new IndexPair(xCell, yCell);
+					yield return indexPairs[xCell, yCell];
                 }
         }
 
@@ -197,7 +219,7 @@ namespace Common
         {
             for (int i = 0; i < CellLineCount; i++)
             {
-                yield return new IndexPair(i, pair.Y);
+				yield return indexPairs[i, pair.Y];
             }
         }
 
@@ -205,7 +227,7 @@ namespace Common
         {
             for (int j = CellLineCount - 1; j >= 0; j--)
             {
-                yield return new IndexPair(pair.X, j);
+				yield return indexPairs[pair.X, j];
             }
         }
 
@@ -216,7 +238,7 @@ namespace Common
             for (int j = CellLineCount - 1; j >= 0; j -= BlockLineCount)
                 for (int i = 0; i < CellLineCount; i += BlockLineCount)
                 {
-                    result.AddRange(GetBlockPairs(new IndexPair(i, j)));
+					result.AddRange(GetBlockPairs(indexPairs[i, j]));
                 }
 
             return result;
@@ -227,7 +249,7 @@ namespace Common
             for (int i = 0; i < CellLineCount; i++)
                 for (int j = 0; j < CellLineCount; j++)
                 {
-                    yield return new IndexPair(i, j);
+					yield return indexPairs[i, j];
                 }
         }
     }

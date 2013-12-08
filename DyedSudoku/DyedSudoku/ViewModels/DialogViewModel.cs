@@ -11,13 +11,18 @@ namespace DyedSudoku
 
         private RectangleF Frame { get; set; }
 
-        private float cellHeight;
-        private float cellWidth;
+        private readonly float cellHeight;
+        private readonly float cellWidth;
         private readonly DateTime CreatedTime;
         private readonly TimeSpan delaySpan = new TimeSpan(0, 0, 0, 0, 500);
         private const int cellCount = 3;
         private const float cellContentLeft = 13;
         private const float cellContentBottom = 10;
+
+		public bool IsInvisible
+		{
+			get { return DateTime.Now - CreatedTime < delaySpan; }
+		}
 
         public DialogViewModel(RectangleF frame, float border)
         {
@@ -27,7 +32,7 @@ namespace DyedSudoku
             cellHeight = Frame.Height / cellCount;
             cellWidth = Frame.Width / cellCount;
 
-            CreatedTime = DateTime.Now;
+			CreatedTime = DateTime.Now;
         }
 
         public void Draw(CGContext context)

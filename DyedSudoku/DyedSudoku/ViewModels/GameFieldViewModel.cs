@@ -111,7 +111,9 @@ namespace DyedSudoku
                 if (Model.IsItemEmpty(pair))
                     continue;
 
-                if (Model.GetItemVisible(pair))
+				if (Model.IsSelectedPair(pair))
+				    context.SetFillSelectedItemColor();
+				else if (Model.GetItemVisible(pair))
                     context.SetFillVisibleItemColor();
                 else
                     context.SetFillInitializedItemColor();
@@ -214,7 +216,7 @@ namespace DyedSudoku
 
             if (Mode == EMode.Dialog)
             {
-                if (DialogViewModel == null)
+				if (DialogViewModel == null || DialogViewModel.IsInvisible)
                     return;
 
                 if (DialogViewModel.IsInside(ctmPoint))

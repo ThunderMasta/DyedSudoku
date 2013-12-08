@@ -24,7 +24,7 @@
     <MtouchDebug>true</MtouchDebug>
     <MtouchI18n>
     </MtouchI18n>
-    <MtouchArch>ARMv7</MtouchArch>
+    <MtouchArch>ARMv7, ARMv7s</MtouchArch>
     <AssemblyName>DyedSudoku</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -69,8 +69,8 @@
     </MtouchI18n>
     <MtouchArch>ARMv7, ARMv7s</MtouchArch>
     <MtouchLink>Full</MtouchLink>
-    <MtouchUseSGen>true</MtouchUseSGen>
     <AssemblyName>Utility</AssemblyName>
+    <MtouchUseSGen>true</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>full</DebugType>

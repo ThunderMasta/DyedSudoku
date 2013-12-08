@@ -10,5 +10,9 @@
 	<array>
 		<string>Icon</string>
 	</array>
+	<key>CFBundleDisplayName</key>
+	<string>DyedSudoku</string>
+	<key>MinimumOSVersion</key>
+	<string>5.0</string>
 </dict>
 </plist>

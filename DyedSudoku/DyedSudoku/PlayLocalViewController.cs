@@ -3,6 +3,7 @@ using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DyedSudoku
 {
@@ -32,7 +33,7 @@ namespace DyedSudoku
         private void StartUpdateThread()
         {
             needUpdateGameField = true;
-            ThreadPool.QueueUserWorkItem(UpdateGameField);
+			UpdateGameField();
         }
 
         private void StopUpdateThread()
@@ -68,13 +69,13 @@ namespace DyedSudoku
                 Done(this, EventArgs.Empty);
         }
 
-        private void UpdateGameField(object obj)
+        private async void UpdateGameField()
         {
             while (needUpdateGameField)
             {
-                //Sleep for 60 fps
-                Thread.Sleep(15);
-                BeginInvokeOnMainThread(() => gameFieldView.SetNeedsDisplay());
+                //Sleep for 10 fps
+                await Task.Delay(100);
+                BeginInvokeOnMainThread(gameFieldView.SetNeedsDisplay);
             }
         }
 
