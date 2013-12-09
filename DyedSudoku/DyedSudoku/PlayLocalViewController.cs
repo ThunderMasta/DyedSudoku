@@ -12,6 +12,9 @@ namespace DyedSudoku
 		// Need update thread for custom animation
 		private volatile bool needUpdateGameField;
 		private GameFieldViewModel gameFieldViewModel;
+		private const int defaultDelay = 100;
+		private const float defaultOffset = 5f;
+		private bool isPaused;
 
 		public PlayLocalViewController() : base("PlayLocalViewController", null)
 		{
@@ -22,8 +25,8 @@ namespace DyedSudoku
 
 		private void InitGameFieldView()
 		{
-			var width = View.Frame.Width - 10;
-			var frame = new RectangleF(5, gameFieldView.Frame.Y, width, width);
+			var width = View.Frame.Width - 2 * defaultOffset;
+			var frame = new RectangleF(defaultOffset, gameFieldView.Frame.Y, width, width);
 
 			gameFieldView.Frame = frame;
 			gameFieldViewModel = new GameFieldViewModel(frame);
@@ -79,9 +82,27 @@ namespace DyedSudoku
 			while (needUpdateGameField)
 			{
 				//Sleep for 10 fps
-				await Task.Delay(100);
-				BeginInvokeOnMainThread(gameFieldView.SetNeedsDisplay);
+				await Task.Delay(defaultDelay);
+
+				if (gameFieldViewModel.NeedRefresh)
+				{
+					Refresh();
+					isPaused = false;
+				}
+				else
+				{
+					if (!isPaused)
+					{
+						Refresh();
+						isPaused = true;
+					}
+				}
 			}
+		}
+
+		private void Refresh()
+		{
+			BeginInvokeOnMainThread(gameFieldView.SetNeedsDisplay);
 		}
 
 		partial void singleTap(NSObject sender)
@@ -101,6 +122,8 @@ namespace DyedSudoku
 				gameFieldViewModel.UpdateByTap(gameFieldPoint);
 			else
 				gameFieldViewModel.UpdateByOffboardTap();
+
+			Refresh();
 		}
 	}
 }

@@ -69,7 +69,7 @@
     </MtouchI18n>
     <MtouchArch>ARMv7, ARMv7s</MtouchArch>
     <MtouchLink>Full</MtouchLink>
-    <AssemblyName>Utility</AssemblyName>
+    <AssemblyName>DyedSudoku</AssemblyName>
     <MtouchUseSGen>true</MtouchUseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
@@ -101,8 +101,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
     <Reference Include="monotouch" />
   </ItemGroup>
   <ItemGroup>

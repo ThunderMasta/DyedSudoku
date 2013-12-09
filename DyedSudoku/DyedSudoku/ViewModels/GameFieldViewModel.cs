@@ -32,6 +32,11 @@ namespace DyedSudoku
 			get { return Mode == EMode.Win || Mode == EMode.Lose; }
 		}
 
+		public bool NeedRefresh
+		{
+			get { return Model != null && Model.IsInitializing || Mode == EMode.Dialog && DialogViewModel != null && DialogViewModel.IsInvisible; }
+		}
+
 		private float cellHeight;
 		private float cellWidth;
 		private float blockHeight;
