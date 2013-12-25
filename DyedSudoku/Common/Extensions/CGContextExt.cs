@@ -80,17 +80,17 @@ namespace Common
 
         public static void SetFillEmptyItemColor(this CGContext context)
         {
-            context.SetFillColor(UIColor.Red.CGColor);
+			context.SetFillColor(((float)0xff/0xff), ((float)0x66/0xff), ((float)0x66/0xff), ((float)0xff/0xff));
         }
 
         public static void SetFillInitializedItemColor(this CGContext context)
         {
-            context.SetFillColor(UIColor.Blue.CGColor);
+			context.SetFillColor(((float)0x00/0xff), ((float)0x99/0xff), ((float)0xff/0xff), ((float)0xff/0xff));
         }
 
         public static void SetFillVisibleItemColor(this CGContext context)
         {
-            context.SetFillColor(UIColor.Green.CGColor);
+			context.SetFillColor(((float)0x33/0xff), ((float)0xff/0xff), ((float)0x66/0xff), ((float)0xff/0xff));
         }
 
         public static void SetFillSelectedItemColor(this CGContext context)
