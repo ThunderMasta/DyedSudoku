@@ -60,7 +60,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Evgeny Frolov (YJ488JQXS9)</CodesignKey>
     <AssemblyOriginatorKeyFile>..\..\..\..\Downloads\ios_development.cer</AssemblyOriginatorKeyFile>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <IpaPackageName>
@@ -71,6 +71,7 @@
     <MtouchLink>Full</MtouchLink>
     <AssemblyName>DyedSudoku</AssemblyName>
     <MtouchUseSGen>true</MtouchUseSGen>
+    <CodesignProvision>E55C2696-39C2-4A35-8486-CD527413331A</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>full</DebugType>
