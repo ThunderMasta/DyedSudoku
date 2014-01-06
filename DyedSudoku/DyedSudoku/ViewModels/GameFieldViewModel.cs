@@ -83,7 +83,7 @@ namespace DyedSudoku
 
 			SetCurrentContext(ctx);
 
-			if (Model.IsInitializing)
+			if (Model.IsEmpty || Model.IsInitializing)
 			{
 				DrawBackground();
 				DrawCellsBackground();
