@@ -47,5 +47,6 @@
     <Compile Include="Extensions\RandomExt.cs" />
     <Compile Include="IndexPair.cs" />
     <Compile Include="Extensions\IEnumerableExt.cs" />
+    <Compile Include="Helpers\ColorHelper.cs" />
   </ItemGroup>
 </Project>
