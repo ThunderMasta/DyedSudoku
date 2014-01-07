@@ -8,7 +8,12 @@
 	</array>
 	<key>CFBundleIconFiles</key>
 	<array>
-		<string>Icon</string>
+		<string>Icon57h</string>
+		<string>Icon120h</string>
+		<string>Icon114h</string>
+		<string>Icon80h</string>
+		<string>Icon58h</string>
+		<string>Icon29h</string>
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Dyed Sudoku</string>
@@ -19,6 +24,6 @@
 	<key>CFBundleShortVersionString</key>
 	<string>0.9</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 </dict>
 </plist>
