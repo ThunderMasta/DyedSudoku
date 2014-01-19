@@ -100,6 +100,22 @@
     <AssemblyOriginatorKeyFile>..\..\..\..\Downloads\ios_development.cer</AssemblyOriginatorKeyFile>
     <AssemblyName>Utility</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|iPhone' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Distribution</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <AssemblyName>DyedSudoku</AssemblyName>
+    <CodesignKey>iPhone Distribution: Evgeny Frolov (HTB7L2XAX2)</CodesignKey>
+    <CodesignProvision>71DC12B8-9A8E-4503-8DAB-6AD706B02AB1</CodesignProvision>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchUseSGen>true</MtouchUseSGen>
+    <IpaPackageName>
+    </IpaPackageName>
+    <MtouchLink>Full</MtouchLink>
+    <MtouchI18n>
+    </MtouchI18n>
+    <MtouchArch>ARMv7, ARMv7s</MtouchArch>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="monotouch" />
