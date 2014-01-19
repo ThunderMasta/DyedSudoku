@@ -1,6 +1,5 @@
 DyedSudoku
 ==========
 
-iPhone sudoku full of colour funny dyes
-
-and extremely random boards
+Random generated sudoku. Extremely random.
+Tap Generate button to generate board, tap cell to open Number dialog.
