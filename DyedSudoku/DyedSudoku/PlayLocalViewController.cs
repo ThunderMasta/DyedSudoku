@@ -56,7 +56,12 @@ namespace DyedSudoku
 			// Releases the view if it doesn't have a superview.
 			base.DidReceiveMemoryWarning();
 			
-			// Release any cached data, images, etc that aren't in use.
+			if (gameFieldViewModel != null)
+				gameFieldViewModel.Cancel();
+
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
 		}
 
 		public event EventHandler Done;

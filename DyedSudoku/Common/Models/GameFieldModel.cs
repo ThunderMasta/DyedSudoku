@@ -58,6 +58,8 @@ namespace Common
 		{
 			if (IsInitializing && cancellationTokenSource != null)
 				cancellationTokenSource.Cancel();
+
+			EndInitializing();
 		}
 
 		private void InitField()
